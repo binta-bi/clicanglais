@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -61,12 +62,12 @@ export default function Catalogue() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {visibles.map((c) => (
-          <div key={c.id} className="border rounded p-4 flex flex-col gap-2">
+           <Link href={`/cours/${c.id}`} key={c.id} className="border rounded p-4 flex flex-col gap-2 hover:shadow">
             <h2 className="font-bold">{c.title}</h2>
             <p className="text-sm">{c.description}</p>
             <p className="text-sm text-gray-500">Niveau : {c.niveau}</p>
             <p className="font-medium">{c.price.toLocaleString('fr-FR')} GNF</p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

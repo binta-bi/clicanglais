@@ -22,6 +22,7 @@ export default function Header() {
         </Link>
         <div className="flex items-center gap-4 text-sm">
           <Link href="/cours">Cours</Link>
+          {connecte && <Link href="/mes-cours">Mes cours</Link>}
           {connecte ? (
             <button onClick={() => supabase.auth.signOut()}>Déconnexion</button>
           ) : (

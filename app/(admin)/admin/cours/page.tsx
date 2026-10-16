@@ -112,6 +112,7 @@ export default function AdminCours() {
               </p>
             </div>
             <div className="flex gap-2 text-sm">
+            <Link href={`/admin/cours/${c.id}`} className="border px-3 py-1 rounded">Leçons</Link>
               <button onClick={() => basculer(c)} className="border px-3 py-1 rounded">
                 {c.is_published ? 'Dépublier' : 'Publier'}
               </button>

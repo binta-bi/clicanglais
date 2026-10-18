@@ -12,11 +12,7 @@ export default function Header() {
       setEstProf(false)
       return
     }
-    const { data } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single()
+    const { data } = await supabase.from('profiles').select('role').eq('id', userId).single()
     setEstProf(data?.role === 'professeur')
   }
 
@@ -33,16 +29,16 @@ export default function Header() {
   }, [])
 
   return (
-    <header className="border-b">
-      <nav className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-[#2d3a6b]">
-          Clic<span className="text-[#e8652d]">Anglais</span>
+    <header className="border-b border-line bg-white">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-3">
+        <Link href="/" className="text-2xl font-extrabold tracking-tight text-navy">
+          Clic<span className="text-brand">Anglais</span>
         </Link>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
           <Link href="/cours">Cours</Link>
           {connecte && <Link href="/mes-cours">Mes cours</Link>}
           {estProf && (
-            <Link href="/admin" className="font-medium text-[#e8652d]">
+            <Link href="/admin" className="font-bold text-brand-deep">
               Espace professeur
             </Link>
           )}
@@ -51,7 +47,7 @@ export default function Header() {
           ) : (
             <>
               <Link href="/connexion">Connexion</Link>
-              <Link href="/inscription" className="bg-[#2d3a6b] text-white px-3 py-1 rounded">
+              <Link href="/inscription" className="rounded-lg bg-navy px-3 py-1.5 text-white">
                 Inscription
               </Link>
             </>

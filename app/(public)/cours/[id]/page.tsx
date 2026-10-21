@@ -1,12 +1,10 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import AvisCours from '@/components/Avis'
 
-export default async function FicheCours({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+async function Contenu({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   const { data: course } = await supabase
@@ -24,7 +22,7 @@ export default async function FicheCours({
     .order('position')
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 px-4 flex flex-col gap-6">
+    <div className="max-w-2xl mx-auto mt-10 px-4 pb-16 flex flex-col gap-6">
       <Link href="/cours" className="text-sm text-[#2d3a6b]">
         ← Retour aux cours
       </Link>
@@ -47,7 +45,7 @@ export default async function FicheCours({
 
       <div className="flex items-center gap-4">
         <p className="text-2xl font-bold">
-          {course.price.toLocaleString('fr-FR')} GNF
+          {Number(course.price).toLocaleString('fr-FR')} FCFA
         </p>
         <button
           disabled
@@ -56,6 +54,21 @@ export default async function FicheCours({
           Acheter (bientôt)
         </button>
       </div>
+
+      <AvisCours courseId={course.id} />
     </div>
+  )
+}
+
+// params est lu sous <Suspense> pour que le site se compile en production
+export default function FicheCours({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  return (
+    <Suspense fallback={<p className="text-center mt-10">Chargement...</p>}>
+      <Contenu params={params} />
+    </Suspense>
   )
 }

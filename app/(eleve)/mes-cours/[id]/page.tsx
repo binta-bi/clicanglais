@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -12,7 +12,7 @@ type Lesson = {
   transcription: Segment[] | null
 }
 
-export default function Lecteur() {
+function Lecteur() {
   const { id } = useParams<{ id: string }>()
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [current, setCurrent] = useState(0)
@@ -128,5 +128,14 @@ export default function Lecteur() {
         </div>
       </div>
     </div>
+  )
+}
+
+// useParams() doit être lu sous <Suspense> pour que le site se compile en production
+export default function PageLecteur() {
+  return (
+    <Suspense fallback={<p className="text-center mt-10">Chargement...</p>}>
+      <Lecteur />
+    </Suspense>
   )
 }

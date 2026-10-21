@@ -57,11 +57,12 @@ const lignesTests = [
 ]
 
 const regles = [
-  'Le test est gratuit et se passe sur la plateforme. La correction est automatique : tu vois ton score dès que tu envoies tes réponses.',
-  'Tu as un seul essai. Le test ne se repasse pas.',
-  'Le temps est compté dès que tu ouvres le test. Une réponse envoyée après le temps imparti compte comme un échec.',
-  'Si tu n’atteins pas 80\u00a0%, ou si tu dépasses le temps, tu commences directement au niveau Débutant.',
-  'Le test de niveau ne remplace pas l’examen final de chaque niveau. Cet examen est obligatoire pour recevoir l’attestation.',
+  'Les tests sont gratuits et se passent sur la plateforme. La correction est automatique : tu vois ton score dès que tu envoies tes réponses.',
+  'Chaque test ne se passe qu’une fois. Il ne se repasse pas.',
+  'Le temps est compté dès que tu cliques sur « Commencer le test ». Une réponse envoyée après le temps imparti compte comme un échec.',
+  'Pour entrer en Avancé, passe d’abord le test Intermédiaire. Si tu penses déjà maîtriser l’Intermédiaire, tu peux passer directement le test Avancé.',
+  'Si tu rates le test Intermédiaire, tu commences au niveau Débutant. Si tu rates le test Avancé, tu passes le test Intermédiaire.',
+  'Les tests de niveau ne remplacent pas l’examen final de chaque niveau. Cet examen est obligatoire pour recevoir l’attestation.',
 ]
 
 function Coche({ className = '' }: { className?: string }) {
@@ -225,8 +226,8 @@ export default function Accueil() {
               Admission et test de niveau
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink/80">
-              Le niveau Débutant est ouvert à tous, sans test. Pour entrer directement plus haut,
-              passe le test qui correspond à ton objectif.
+              Le niveau Débutant est ouvert à tous, sans test. Pour entrer plus haut, passe d’abord
+              le test Intermédiaire, ou le test Avancé si tu maîtrises déjà l’Intermédiaire.
             </p>
             <ul className="mt-8 flex flex-col gap-4">
               {regles.map((regle) => (

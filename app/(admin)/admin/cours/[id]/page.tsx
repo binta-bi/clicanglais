@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -42,7 +42,7 @@ function parseSousTitres(contenu: string): Segment[] {
   return segments
 }
 
-export default function AdminLecons() {
+function AdminLecons() {
   const { id } = useParams<{ id: string }>()
   const [titreCours, setTitreCours] = useState('')
   const [lessons, setLessons] = useState<Lesson[]>([])
@@ -64,6 +64,7 @@ export default function AdminLecons() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     charger()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
@@ -171,5 +172,14 @@ export default function AdminLecons() {
         ))}
       </div>
     </div>
+  )
+}
+
+// useParams() doit être lu sous <Suspense> pour que le site se compile en production
+export default function PageAdminLecons() {
+  return (
+    <Suspense fallback={<p className="text-center mt-10">Chargement...</p>}>
+      <AdminLecons />
+    </Suspense>
   )
 }

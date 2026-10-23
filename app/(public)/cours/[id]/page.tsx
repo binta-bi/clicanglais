@@ -2,14 +2,16 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import AccesCours from '@/components/AccesCours'
 import AvisCours from '@/components/Avis'
+import { NOM_NIVEAU, type NiveauSlug } from '@/lib/tests'
 
 async function Contenu({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   const { data: course } = await supabase
     .from('courses')
-    .select('id, title, description, niveau, price')
+    .select('id, title, description, niveau, mois, price, programme')
     .eq('id', id)
     .single()
 
@@ -21,21 +23,32 @@ async function Contenu({ params }: { params: Promise<{ id: string }> }) {
     .eq('course_id', id)
     .order('position')
 
+  // Titres des leçons mises en ligne, sinon le programme prévu pour le mois
+  const mises = (lessons ?? []).map((l) => l.title as string)
+  const prevues: string[] = Array.isArray(course.programme) ? course.programme : []
+  const titres = mises.length > 0 ? mises : prevues
+  const nomNiveau = NOM_NIVEAU[course.niveau as NiveauSlug] ?? course.niveau
+
   return (
     <div className="max-w-2xl mx-auto mt-10 px-4 pb-16 flex flex-col gap-6">
       <Link href="/cours" className="text-sm text-[#2d3a6b]">
         ← Retour aux cours
       </Link>
       <h1 className="text-3xl font-bold text-[#2d3a6b]">{course.title}</h1>
-      <p className="text-gray-500">Niveau : {course.niveau}</p>
+      <p className="text-gray-500">
+        Niveau {nomNiveau}
+        {course.mois ? ` · Mois ${course.mois} sur 3` : ''}
+      </p>
       <p>{course.description}</p>
 
       <div>
-        <h2 className="text-xl font-bold mb-2">Contenu du cours</h2>
-        {lessons && lessons.length > 0 ? (
+        <h2 className="text-xl font-bold mb-2">
+          {mises.length > 0 ? 'Leçons du cours' : 'Programme du mois'}
+        </h2>
+        {titres.length > 0 ? (
           <ol className="list-decimal pl-5 flex flex-col gap-1">
-            {lessons.map((l) => (
-              <li key={l.id}>{l.title}</li>
+            {titres.map((t, i) => (
+              <li key={i}>{t}</li>
             ))}
           </ol>
         ) : (
@@ -43,17 +56,7 @@ async function Contenu({ params }: { params: Promise<{ id: string }> }) {
         )}
       </div>
 
-      <div className="flex items-center gap-4">
-        <p className="text-2xl font-bold">
-          {Number(course.price).toLocaleString('fr-FR')} FCFA
-        </p>
-        <button
-          disabled
-          className="bg-[#e8652d] text-white px-5 py-2 rounded opacity-60"
-        >
-          Acheter (bientôt)
-        </button>
-      </div>
+      <AccesCours courseId={course.id} prix={Number(course.price)} />
 
       <AvisCours courseId={course.id} />
     </div>

@@ -15,10 +15,12 @@ export default function AccesCours({
   courseId,
   prix,
   niveau,
+  vendable,
 }: {
   courseId: string
   prix: number
   niveau: NiveauSlug
+  vendable: boolean
 }) {
   const router = useRouter()
   const [etat, setEtat] = useState<Etat>('chargement')
@@ -78,6 +80,14 @@ export default function AccesCours({
         <Link href={`/mes-cours/${courseId}`} className="btn-primary">
           Accéder aux leçons
         </Link>
+      </div>
+    )
+  }
+
+  if (!vendable) {
+    return (
+      <div className="rounded-2xl bg-mist p-5">
+        <p className="font-medium">Ce cours n&apos;est pas encore disponible à l&apos;achat.</p>
       </div>
     )
   }

@@ -56,7 +56,7 @@ async function Contenu({ params }: { params: Promise<{ id: string }> }) {
         )}
       </div>
 
-      <AccesCours courseId={course.id} prix={Number(course.price)} niveau={course.niveau as NiveauSlug} />
+      <AccesCours courseId={course.id} prix={Number(course.price)} niveau={course.niveau as NiveauSlug} vendable={course.mois !== null} />
 
       <AvisCours courseId={course.id} />
     </div>

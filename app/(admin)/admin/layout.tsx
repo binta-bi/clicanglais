@@ -36,6 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav aria-label="Espace professeur" className="mb-6 flex gap-4 border-b pb-3 font-medium">
         <Link href="/admin">Accueil</Link>
         <Link href="/admin/cours">Cours</Link>
+        <Link href="/admin/direct">Direct</Link>
         <Link href="/admin/avis">Avis</Link>
       </nav>
       {children}

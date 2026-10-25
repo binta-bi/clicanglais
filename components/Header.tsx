@@ -37,6 +37,7 @@ export default function Header() {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
           <Link href="/cours">Cours</Link>
           {connecte && <Link href="/mes-cours">Mes cours</Link>}
+          {connecte && <Link href="/direct">Direct</Link>}
           {estProf && (
             <Link href="/admin" className="font-bold text-brand-deep">
               Espace professeur

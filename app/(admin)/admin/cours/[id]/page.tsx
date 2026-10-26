@@ -124,6 +124,9 @@ function AdminLecons() {
       <div>
         <Link href="/admin/cours" className="text-sm text-[#2d3a6b]">← Mes cours</Link>
         <h1 className="text-2xl font-bold mt-2">Leçons : {titreCours}</h1>
+        <Link href={`/admin/cours/${id}/modifier`} className="inline-block mt-2 text-sm border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded">
+          Modifier les infos du cours
+        </Link>
       </div>
 
       <form onSubmit={ajouter} className="border rounded p-4 flex flex-col gap-3 max-w-xl">

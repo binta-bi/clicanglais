@@ -51,6 +51,9 @@ export default function Connexion() {
       <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
         {envoi ? 'Connexion...' : 'Se connecter'}
       </button>
+      <Link href="/mot-de-passe-oublie" className="font-medium underline">
+        Mot de passe oublié ?
+      </Link>
       <p>
         Pas encore de compte ?{' '}
         <Link href="/inscription" className="font-bold underline">

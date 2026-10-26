@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import LienMessages from '@/components/LienMessages'
 
 export default function Header() {
   const [connecte, setConnecte] = useState(false)
@@ -37,7 +38,8 @@ export default function Header() {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
           <Link href="/cours">Cours</Link>
           {connecte && <Link href="/mes-cours">Mes cours</Link>}
-          {connecte && <Link href="/direct">Direct</Link>}
+          {connecte && !estProf && <Link href="/direct">Direct</Link>}
+          {connecte && !estProf && <LienMessages href="/messages" />}
           {estProf && (
             <Link href="/admin" className="font-bold text-brand-deep">
               Espace professeur

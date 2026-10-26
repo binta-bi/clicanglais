@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import LienMessages from '@/components/LienMessages'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [ok, setOk] = useState(false)
@@ -38,6 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Link href="/admin/cours">Cours</Link>
         <Link href="/admin/direct">Direct</Link>
         <Link href="/admin/avis">Avis</Link>
+        <LienMessages href="/admin/messages" />
       </nav>
       {children}
     </div>

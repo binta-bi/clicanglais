@@ -67,6 +67,17 @@ export default function Inscription() {
           {message}
         </p>
       )}
+      <p className="text-sm">
+        En créant un compte, tu acceptes les{' '}
+        <Link href="/cgu" className="font-bold underline">
+          conditions d’utilisation
+        </Link>{' '}
+        et la{' '}
+        <Link href="/confidentialite" className="font-bold underline">
+          politique de confidentialité
+        </Link>
+        .
+      </p>
       <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
         {envoi ? 'Création...' : 'S’inscrire'}
       </button>

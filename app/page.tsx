@@ -301,10 +301,12 @@ export default function Accueil() {
             </span>
             <span className="ml-3">Apprends l’anglais en quelques clics</span>
           </p>
-          <nav className="flex gap-5 text-sm font-medium">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">
             <Link href="/cours">Cours</Link>
             <Link href="/connexion">Connexion</Link>
             <Link href="/inscription">Inscription</Link>
+            <Link href="/cgu">Conditions</Link>
+            <Link href="/confidentialite">Confidentialité</Link>
           </nav>
         </div>
       </footer>

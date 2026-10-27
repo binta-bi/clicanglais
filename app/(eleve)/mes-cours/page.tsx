@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { NOM_NIVEAU, type NiveauSlug } from '@/lib/tests'
+import { verifierPaiementWave } from '@/lib/wave-client'
 
 type Achat = {
   id: string
@@ -25,6 +26,21 @@ export default function MesCours() {
       if (!user) {
         router.push('/connexion')
         return
+      }
+      // Rattrapage : un paiement Wave fait mais pas encore confirmé (page fermée trop tôt)
+      const { data: attente } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('status', 'en_attente')
+        .eq('provider', 'wave')
+        .order('created_at', { ascending: false })
+        .limit(3)
+      for (const o of (attente as { id: string }[]) || []) {
+        try {
+          await verifierPaiementWave(o.id)
+        } catch {
+          // sans gravité : l'élève pourra revérifier depuis la page de paiement
+        }
       }
       const { data } = await supabase
         .from('purchases')

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { NOM_NIVEAU, type NiveauSlug } from '@/lib/tests'
+import { demarrerPaiementWave, verifierPaiementWave } from '@/lib/wave-client'
 
 type Commande = {
   id: string
@@ -11,6 +12,7 @@ type Commande = {
   niveau: NiveauSlug | null
   amount: number
   status: 'en_attente' | 'paye' | 'echoue'
+  provider: string
   courses: { title: string } | null
 }
 
@@ -26,6 +28,7 @@ function Paiement() {
   const [pret, setPret] = useState(false)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
+  const [verification, setVerification] = useState(false)
 
   useEffect(() => {
     let annule = false
@@ -39,20 +42,68 @@ function Paiement() {
       }
       const { data } = await supabase
         .from('orders')
-        .select('id, kind, niveau, amount, status, courses(title)')
+        .select('id, kind, niveau, amount, status, provider, courses(title)')
         .eq('id', id)
         .maybeSingle()
       const { data: actif } = await supabase.rpc('paiement_simule_actif')
       if (annule) return
-      setCommande((data as unknown as Commande) ?? null)
+      const cmd = (data as unknown as Commande) ?? null
+      setCommande(cmd)
       setSimule(actif === true)
       setPret(true)
+
+      // Retour depuis Wave : on demande à Wave si le paiement est bien passé
+      // (quelques essais, car la confirmation peut prendre quelques secondes).
+      if (cmd && cmd.status === 'en_attente' && cmd.provider === 'wave') {
+        const retour = new URLSearchParams(window.location.search).get('retour') === '1'
+        const essais = retour ? 6 : 1
+        setVerification(true)
+        for (let i = 0; i < essais && !annule; i++) {
+          try {
+            const { status } = await verifierPaiementWave(id)
+            if (annule) return
+            if (status !== 'en_attente') {
+              setCommande((c) => (c ? { ...c, status } : c))
+              break
+            }
+          } catch (e) {
+            if (!annule) setErreur(e instanceof Error ? e.message : 'Erreur de vérification.')
+            break
+          }
+          if (i < essais - 1) await new Promise((ok) => setTimeout(ok, 3000))
+        }
+        if (!annule) setVerification(false)
+      }
     }
     charger()
     return () => {
       annule = true
     }
   }, [id, router])
+
+  async function payerAvecWave() {
+    setErreur('')
+    setEnvoi(true)
+    try {
+      const { url } = await demarrerPaiementWave(id)
+      window.location.href = url
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : 'Erreur de paiement. Réessaie.')
+      setEnvoi(false)
+    }
+  }
+
+  async function reverifier() {
+    setErreur('')
+    setVerification(true)
+    try {
+      const { status } = await verifierPaiementWave(id)
+      setCommande((c) => (c ? { ...c, status } : c))
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : 'Erreur de vérification.')
+    }
+    setVerification(false)
+  }
 
   async function simuler(reussi: boolean) {
     setErreur('')
@@ -140,9 +191,31 @@ function Paiement() {
           </div>
         </section>
       ) : (
-        <p className="mt-6 rounded-2xl bg-mist p-5 font-medium">
-          Le paiement en ligne sera bientôt disponible. Reviens dans quelques jours.
-        </p>
+        <section className="mt-6 flex flex-col gap-4 rounded-2xl bg-mist p-6">
+          {verification ? (
+            <p role="status" className="font-medium">
+              Vérification de ton paiement avec Wave...
+            </p>
+          ) : (
+            <>
+              <p className="font-medium">
+                {commande.provider === 'wave'
+                  ? "Ton paiement n'est pas encore confirmé. Si tu as déjà payé, attends quelques secondes puis vérifie."
+                  : "Tu seras envoyé vers l'application Wave pour valider le paiement."}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button onClick={payerAvecWave} disabled={envoi} className="btn-primary disabled:opacity-50">
+                  {envoi ? 'Ouverture de Wave...' : 'Payer avec Wave'}
+                </button>
+                {commande.provider === 'wave' && (
+                  <button onClick={reverifier} className="btn-secondary">
+                    J&apos;ai payé : vérifier mon paiement
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </section>
       )}
 
       {erreur && (

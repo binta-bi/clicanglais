@@ -42,6 +42,86 @@ function parseSousTitres(contenu: string): Segment[] {
   return segments
 }
 
+function EditerLecon({
+  lecon,
+  onFini,
+  onAnnuler,
+}: {
+  lecon: Lesson
+  onFini: () => void
+  onAnnuler: () => void
+}) {
+  const [titre, setTitre] = useState(lecon.title)
+  const [lien, setLien] = useState(lecon.video_url)
+  const [fichier, setFichier] = useState<File | null>(null)
+  const [retirer, setRetirer] = useState(false)
+  const [erreur, setErreur] = useState('')
+  const [envoi, setEnvoi] = useState(false)
+
+  async function enregistrer(e: React.FormEvent) {
+    e.preventDefault()
+    setErreur('')
+    const champs: { title: string; video_url: string; transcription?: Segment[] | null } = {
+      title: titre.trim(),
+      video_url: lien.trim(),
+    }
+    if (fichier) {
+      const segments = parseSousTitres(await fichier.text())
+      if (segments.length === 0) {
+        setErreur('Impossible de lire ce fichier. Utilise un fichier .srt ou .vtt.')
+        return
+      }
+      champs.transcription = segments
+    } else if (retirer) {
+      champs.transcription = null
+    }
+    setEnvoi(true)
+    const { error } = await supabase.from('lessons').update(champs).eq('id', lecon.id)
+    setEnvoi(false)
+    if (error) {
+      setErreur(error.message)
+      return
+    }
+    onFini()
+  }
+
+  return (
+    <form onSubmit={enregistrer} className="border rounded p-4 flex flex-col gap-3 bg-gray-50">
+      <h3 className="font-bold">Modifier la leçon</h3>
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        Titre
+        <input value={titre} required onChange={(e) => setTitre(e.target.value)} className="border p-2 rounded font-normal bg-white" />
+      </label>
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        Lien de la vidéo
+        <input type="url" value={lien} required onChange={(e) => setLien(e.target.value)} className="border p-2 rounded font-normal bg-white" />
+      </label>
+      <p className="text-sm text-gray-600">
+        {lecon.transcription?.length
+          ? `Transcription actuelle : ${lecon.transcription.length} phrases.`
+          : 'Cette leçon n\u2019a pas de transcription.'}
+      </p>
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        Remplacer la transcription (fichier .srt ou .vtt, facultatif)
+        <input type="file" accept=".srt,.vtt" onChange={(e) => setFichier(e.target.files?.[0] || null)} />
+      </label>
+      {!!lecon.transcription?.length && !fichier && (
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={retirer} onChange={(e) => setRetirer(e.target.checked)} />
+          Supprimer la transcription actuelle
+        </label>
+      )}
+      {erreur && <p role="alert" className="text-red-500 text-sm">{erreur}</p>}
+      <div className="flex gap-2">
+        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white px-4 py-2 rounded disabled:opacity-50">
+          {envoi ? 'Enregistrement...' : 'Enregistrer'}
+        </button>
+        <button type="button" onClick={onAnnuler} className="border px-4 py-2 rounded">Annuler</button>
+      </div>
+    </form>
+  )
+}
+
 function AdminLecons() {
   const { id } = useParams<{ id: string }>()
   const [titreCours, setTitreCours] = useState('')
@@ -51,6 +131,7 @@ function AdminLecons() {
   const [fichier, setFichier] = useState<File | null>(null)
   const [message, setMessage] = useState('')
   const [envoi, setEnvoi] = useState(false)
+  const [edition, setEdition] = useState<string | null>(null)
 
   async function charger() {
     const { data: c } = await supabase.from('courses').select('title').eq('id', id).single()
@@ -156,23 +237,36 @@ function AdminLecons() {
 
       <div className="flex flex-col gap-3">
         {lessons.length === 0 && <p className="text-gray-500">Aucune leçon pour l&apos;instant.</p>}
-        {lessons.map((l, i) => (
-          <div key={l.id} className="border rounded p-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="font-bold">{i + 1}. {l.title}</p>
-              <p className="text-sm text-gray-500">
-                {l.transcription?.length
-                  ? `Transcription : ${l.transcription.length} phrases`
-                  : 'Pas de transcription'}
-              </p>
+        {lessons.map((l, i) =>
+          edition === l.id ? (
+            <EditerLecon
+              key={l.id}
+              lecon={l}
+              onFini={() => {
+                setEdition(null)
+                charger()
+              }}
+              onAnnuler={() => setEdition(null)}
+            />
+          ) : (
+            <div key={l.id} className="border rounded p-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-bold">{i + 1}. {l.title}</p>
+                <p className="text-sm text-gray-500">
+                  {l.transcription?.length
+                    ? `Transcription : ${l.transcription.length} phrases`
+                    : 'Pas de transcription'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <button onClick={() => deplacer(i, -1)} disabled={i === 0} className="border px-3 py-1 rounded disabled:opacity-30">↑</button>
+                <button onClick={() => deplacer(i, 1)} disabled={i === lessons.length - 1} className="border px-3 py-1 rounded disabled:opacity-30">↓</button>
+                <button onClick={() => setEdition(l.id)} className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded">Modifier</button>
+                <button onClick={() => supprimer(l)} className="border border-red-500 text-red-500 px-3 py-1 rounded">Supprimer</button>
+              </div>
             </div>
-            <div className="flex gap-2 text-sm">
-              <button onClick={() => deplacer(i, -1)} disabled={i === 0} className="border px-3 py-1 rounded disabled:opacity-30">↑</button>
-              <button onClick={() => deplacer(i, 1)} disabled={i === lessons.length - 1} className="border px-3 py-1 rounded disabled:opacity-30">↓</button>
-              <button onClick={() => supprimer(l)} className="border border-red-500 text-red-500 px-3 py-1 rounded">Supprimer</button>
-            </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
     </div>
   )

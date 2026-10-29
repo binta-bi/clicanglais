@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import LecteurVideo, { type CommandesLecteur } from '@/components/LecteurVideo'
 
 type Segment = { start: number; end: number; text: string }
 type Lesson = {
@@ -19,7 +20,7 @@ function Lecteur() {
   const [vues, setVues] = useState<string[]>([])
   const [temps, setTemps] = useState(0)
   const [loading, setLoading] = useState(true)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const lecteurRef = useRef<CommandesLecteur>(null)
   const actifRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -73,16 +74,12 @@ function Lecteur() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-2 flex flex-col gap-4">
-          <video
+          <LecteurVideo
             key={lesson.id}
-            ref={videoRef}
-            src={lesson.video_url}
-            controls
-            controlsList="nodownload"
-            onContextMenu={(e) => e.preventDefault()}
-            onTimeUpdate={(e) => setTemps(e.currentTarget.currentTime)}
-            onEnded={() => marquerVue(lesson.id)}
-            className="w-full rounded bg-black"
+            ref={lecteurRef}
+            url={lesson.video_url}
+            onTemps={setTemps}
+            onFin={() => marquerVue(lesson.id)}
           />
 
           <div className="border rounded p-3 max-h-64 overflow-y-auto flex flex-col gap-1">
@@ -95,12 +92,7 @@ function Lecteur() {
                 <button
                   key={i}
                   ref={actif ? actifRef : null}
-                  onClick={() => {
-                    if (videoRef.current) {
-                      videoRef.current.currentTime = s.start
-                      videoRef.current.play()
-                    }
-                  }}
+                  onClick={() => lecteurRef.current?.chercher(s.start)}
                   className={`text-left p-2 rounded ${
                     actif ? 'bg-[#e8652d] text-white' : 'hover:bg-gray-100'
                   }`}

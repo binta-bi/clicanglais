@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { idYoutube } from '@/lib/youtube'
 
 type Seance = {
   id: string
@@ -143,7 +144,17 @@ export default function Direct() {
                 <p className="text-sm text-ink/70">{s.courses?.title}</p>
                 <p className="text-lg font-bold">{s.title}</p>
                 <p className="mt-1 first-letter:uppercase">{quand(s.starts_at)}</p>
-                {s.replay_url && estVideo(s.replay_url) ? (
+                {s.replay_url && idYoutube(s.replay_url) ? (
+                  <div className="mt-3 aspect-video w-full overflow-hidden rounded bg-black">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${idYoutube(s.replay_url)}?rel=0`}
+                      title={s.title}
+                      allow="encrypted-media; picture-in-picture; fullscreen"
+                      allowFullScreen
+                      className="size-full"
+                    />
+                  </div>
+                ) : s.replay_url && estVideo(s.replay_url) ? (
                   <video
                     src={s.replay_url}
                     controls

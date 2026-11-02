@@ -21,6 +21,7 @@ export default function PageConfidentialite() {
           <li>Ton mot de passe, gardé sous forme chiffrée : nous ne pouvons pas le lire.</li>
           <li>Ton niveau et tes résultats aux tests de niveau (réponses, score, date).</li>
           <li>Tes commandes et les cours que tu as achetés (cours, montant, date).</li>
+          <li>Pour vérifier ton paiement : le numéro de transaction Wave et le numéro de téléphone que tu indiques.</li>
           <li>Tes messages au professeur et les avis que tu publies.</li>
         </ul>
       </section>

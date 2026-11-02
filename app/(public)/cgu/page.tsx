@@ -40,7 +40,8 @@ export default function PageCgu() {
       <section>
         <h2>4. Le paiement</h2>
         <p>
-          Le paiement se fait avec Wave. Ton cours est débloqué dès que Wave confirme ton paiement. Nous ne voyons ni
+          Le paiement se fait avec Wave. Après avoir payé, tu indiques ton numéro de transaction sur le site. Ton cours
+          est débloqué dès que le professeur a vérifié ton paiement, en général en quelques heures. Nous ne voyons ni
           ne gardons ton code secret Wave.
         </p>
       </section>

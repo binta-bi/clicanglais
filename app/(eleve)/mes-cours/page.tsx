@@ -11,10 +11,13 @@ type Achat = {
   courses: { id: string; title: string; niveau: string; mois: number | null } | null
 }
 
+type Attente = { id: string; kind: string; niveau: string | null; amount: number; courses: { title: string } | null }
+
 const ORDRE: Record<string, number> = { debutant: 0, intermediaire: 1, avance: 2 }
 
 export default function MesCours() {
   const [achats, setAchats] = useState<Achat[]>([])
+  const [attente, setAttente] = useState<Attente[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -42,6 +45,15 @@ export default function MesCours() {
           // sans gravité : l'élève pourra revérifier depuis la page de paiement
         }
       }
+      // Paiements déclarés, en attente de validation par le professeur
+      const { data: enAttente } = await supabase
+        .from('orders')
+        .select('id, kind, niveau, amount, courses(title)')
+        .eq('status', 'en_attente')
+        .eq('provider', 'manuel')
+        .not('declare_le', 'is', null)
+        .order('created_at', { ascending: false })
+      setAttente((enAttente as unknown as Attente[]) || [])
       const { data } = await supabase
         .from('purchases')
         .select('id, courses(id, title, niveau, mois)')
@@ -64,6 +76,24 @@ export default function MesCours() {
       <h1 className="text-2xl font-bold">Mes cours</h1>
 
       {loading && <p role="status">Chargement...</p>}
+
+      {attente.length > 0 && (
+        <div className="rounded-2xl border-2 border-brand p-5">
+          <p className="font-bold">Paiement en attente de validation</p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {attente.map((o) => (
+              <li key={o.id}>
+                <Link href={`/paiement/${o.id}`} className="underline">
+                  {o.kind === 'niveau' && o.niveau
+                    ? `Niveau ${NOM_NIVEAU[o.niveau as NiveauSlug] ?? o.niveau} complet`
+                    : (o.courses?.title ?? 'Cours')}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-sm">Le professeur vérifie ton paiement. Ton cours apparaîtra ici dès qu&apos;il sera validé.</p>
+        </div>
+      )}
 
       {!loading && achats.length === 0 && (
         <div className="rounded-2xl bg-mist p-6">

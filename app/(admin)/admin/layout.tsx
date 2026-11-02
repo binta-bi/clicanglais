@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import LienMessages from '@/components/LienMessages'
+import LienPaiements from '@/components/LienPaiements'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [ok, setOk] = useState(false)
@@ -36,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="max-w-5xl mx-auto px-4 mt-6">
       <nav aria-label="Espace professeur" className="mb-6 flex flex-wrap gap-x-4 gap-y-2 border-b pb-3 font-medium">
         <Link href="/admin">Accueil</Link>
+        <LienPaiements href="/admin/paiements" />
         <Link href="/admin/statistiques">Statistiques</Link>
         <Link href="/admin/cours">Cours</Link>
         <Link href="/admin/tests">Tests</Link>

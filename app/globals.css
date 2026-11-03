@@ -41,3 +41,19 @@ body {
     @apply inline-flex items-center justify-center rounded-xl border-2 border-ink px-6 py-3 text-base font-bold text-ink transition-colors hover:bg-ink hover:text-white;
   }
 }
+
+/* Menus (élève et professeur) : le lien change de couleur au survol et au clavier */
+.menu-liens a:not(.menu-bouton),
+.menu-liens button {
+  transition: color 0.15s;
+}
+.menu-liens a:not(.menu-bouton):hover,
+.menu-liens button:hover {
+  color: var(--color-brand-deep);
+}
+.menu-bouton {
+  transition: background-color 0.15s;
+}
+.menu-bouton:hover {
+  background-color: var(--color-brand-deep);
+}

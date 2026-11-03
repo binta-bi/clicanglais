@@ -35,10 +35,11 @@ export default function Header() {
         <Link href="/" className="text-2xl font-extrabold tracking-tight text-navy">
           Clic<span className="text-brand">Anglais</span>
         </Link>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+        <div className="menu-liens flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
           <Link href="/cours">Cours</Link>
           {connecte && <Link href="/mes-cours">Mes cours</Link>}
           {connecte && !estProf && <Link href="/direct">Direct</Link>}
+          {connecte && !estProf && <Link href="/evaluations">Évaluations</Link>}
           {connecte && !estProf && <LienMessages href="/messages" />}
           {estProf && (
             <Link href="/admin" className="font-bold text-brand-deep">
@@ -50,7 +51,7 @@ export default function Header() {
           ) : (
             <>
               <Link href="/connexion">Connexion</Link>
-              <Link href="/inscription" className="rounded-lg bg-navy px-3 py-1.5 text-white">
+              <Link href="/inscription" className="menu-bouton rounded-lg bg-navy px-3 py-1.5 text-white">
                 Inscription
               </Link>
             </>

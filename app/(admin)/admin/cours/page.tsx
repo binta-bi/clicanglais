@@ -2,33 +2,45 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { NOM_NIVEAU, type NiveauSlug } from '@/lib/tests'
 
 type Course = {
   id: string
   title: string
   description: string | null
   niveau: string
-  price: number
+  mois: number | null
   is_published: boolean
 }
+
+const ORDRE: Record<string, number> = { debutant: 0, intermediaire: 1, avance: 2 }
+
+// Les prix ne sont pas gérés ici : ils sont affichés sur la page d'accueil, et le montant
+// à payer est fixé en base (50 000 FCFA par mois).
+const PRIX_PAR_DEFAUT = 50000
 
 export default function AdminCours() {
   const [courses, setCourses] = useState<Course[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [niveau, setNiveau] = useState('debutant')
-  const [price, setPrice] = useState('')
   const [message, setMessage] = useState('')
 
   async function charger() {
     const { data } = await supabase
       .from('courses')
-      .select('id, title, description, niveau, price, is_published')
-      .order('created_at', { ascending: false })
-    setCourses(data || [])
+      .select('id, title, description, niveau, mois, is_published')
+    const liste = ((data as Course[]) || []).sort(
+      (a, b) =>
+        (ORDRE[a.niveau] ?? 9) - (ORDRE[b.niveau] ?? 9) ||
+        (a.mois ?? 9) - (b.mois ?? 9) ||
+        a.title.localeCompare(b.title),
+    )
+    setCourses(liste)
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     charger()
   }, [])
 
@@ -39,7 +51,7 @@ export default function AdminCours() {
       title,
       description,
       niveau,
-      price: Number(price),
+      price: PRIX_PAR_DEFAUT,
       is_published: false,
     })
     if (error) {
@@ -48,7 +60,6 @@ export default function AdminCours() {
     }
     setTitle('')
     setDescription('')
-    setPrice('')
     charger()
   }
 
@@ -72,6 +83,9 @@ export default function AdminCours() {
 
       <form onSubmit={creer} className="border rounded p-4 flex flex-col gap-3 max-w-xl">
         <h2 className="font-bold">Nouveau cours</h2>
+        <p className="text-sm text-gray-600">
+          Les 9 cours mensuels (3 niveaux × 3 mois) existent déjà : publie-les depuis la liste ci-dessous.
+        </p>
         <input
           placeholder="Titre" value={title} required
           onChange={(e) => setTitle(e.target.value)}
@@ -87,12 +101,7 @@ export default function AdminCours() {
           <option value="intermediaire">Intermédiaire</option>
           <option value="avance">Avancé</option>
         </select>
-        <input
-          type="number" min="0" placeholder="Prix (GNF)" value={price} required
-          onChange={(e) => setPrice(e.target.value)}
-          className="border p-2 rounded"
-        />
-        {message && <p className="text-red-500 text-sm">{message}</p>}
+        {message && <p role="alert" className="text-red-500 text-sm">{message}</p>}
         <button type="submit" className="bg-[#2d3a6b] text-white p-2 rounded">
           Créer le cours (en brouillon)
         </button>
@@ -105,14 +114,16 @@ export default function AdminCours() {
             <div>
               <p className="font-bold">{c.title}</p>
               <p className="text-sm text-gray-500">
-                {c.niveau} · {c.price.toLocaleString('fr-FR')} GNF ·{' '}
+                {NOM_NIVEAU[c.niveau as NiveauSlug] ?? c.niveau}
+                {c.mois ? ` · Mois ${c.mois}` : ''} ·{' '}
                 <span className={c.is_published ? 'text-green-600' : 'text-gray-500'}>
                   {c.is_published ? 'Publié' : 'Brouillon'}
                 </span>
               </p>
             </div>
-            <div className="flex gap-2 text-sm">
-            <Link href={`/admin/cours/${c.id}`} className="border px-3 py-1 rounded">Leçons</Link>
+            <div className="flex flex-wrap gap-2 text-sm">
+              <Link href={`/admin/cours/${c.id}`} className="border px-3 py-1 rounded">Leçons</Link>
+              <Link href={`/admin/cours/${c.id}/modifier`} className="border px-3 py-1 rounded">Modifier</Link>
               <button onClick={() => basculer(c)} className="border px-3 py-1 rounded">
                 {c.is_published ? 'Dépublier' : 'Publier'}
               </button>

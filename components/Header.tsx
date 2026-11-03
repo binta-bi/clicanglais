@@ -40,6 +40,7 @@ export default function Header() {
           {connecte && <Link href="/mes-cours">Mes cours</Link>}
           {connecte && !estProf && <Link href="/direct">Direct</Link>}
           {connecte && !estProf && <Link href="/evaluations">Évaluations</Link>}
+          {connecte && <Link href="/club">Club</Link>}
           {connecte && !estProf && <LienMessages href="/messages" />}
           {estProf && (
             <Link href="/admin" className="font-bold text-brand-deep">

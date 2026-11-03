@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import LienMessages from '@/components/LienMessages'
+import LienMenu from '@/components/LienMenu'
 
 export default function Header() {
   const [connecte, setConnecte] = useState(false)
@@ -36,22 +37,22 @@ export default function Header() {
           Clic<span className="text-brand">Anglais</span>
         </Link>
         <div className="menu-liens flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
-          <Link href="/cours">Cours</Link>
-          {connecte && <Link href="/mes-cours">Mes cours</Link>}
-          {connecte && !estProf && <Link href="/direct">Direct</Link>}
-          {connecte && !estProf && <Link href="/evaluations">Évaluations</Link>}
-          {connecte && <Link href="/club">Club</Link>}
+          <LienMenu href="/cours">Cours</LienMenu>
+          {connecte && <LienMenu href="/mes-cours">Mes cours</LienMenu>}
+          {connecte && !estProf && <LienMenu href="/direct">Direct</LienMenu>}
+          {connecte && !estProf && <LienMenu href="/evaluations">Évaluations</LienMenu>}
+          {connecte && <LienMenu href="/club">Club</LienMenu>}
           {connecte && !estProf && <LienMessages href="/messages" />}
           {estProf && (
-            <Link href="/admin" className="font-bold text-brand-deep">
+            <LienMenu href="/admin" className="font-bold text-brand-deep">
               Espace professeur
-            </Link>
+            </LienMenu>
           )}
           {connecte ? (
             <button onClick={() => supabase.auth.signOut()}>Déconnexion</button>
           ) : (
             <>
-              <Link href="/connexion">Connexion</Link>
+              <LienMenu href="/connexion">Connexion</LienMenu>
               <Link href="/inscription" className="menu-bouton rounded-lg bg-navy px-3 py-1.5 text-white">
                 Inscription
               </Link>

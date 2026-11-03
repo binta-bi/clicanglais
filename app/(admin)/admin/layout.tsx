@@ -1,10 +1,10 @@
 'use client'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import LienMessages from '@/components/LienMessages'
 import LienPaiements from '@/components/LienPaiements'
+import LienMenu from '@/components/LienMenu'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [ok, setOk] = useState(false)
@@ -36,15 +36,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="max-w-5xl mx-auto px-4 mt-6">
       <nav aria-label="Espace professeur" className="menu-liens mb-6 flex flex-wrap gap-x-4 gap-y-2 border-b pb-3 font-medium">
-        <Link href="/admin">Accueil</Link>
+        <LienMenu href="/admin">Accueil</LienMenu>
         <LienPaiements href="/admin/paiements" />
-        <Link href="/admin/statistiques">Statistiques</Link>
-        <Link href="/admin/cours">Cours</Link>
-        <Link href="/admin/tests">Tests</Link>
-        <Link href="/admin/evaluations">Évaluations</Link>
-        <Link href="/admin/direct">Direct</Link>
-        <Link href="/club">Club</Link>
-        <Link href="/admin/avis">Avis</Link>
+        <LienMenu href="/admin/statistiques">Statistiques</LienMenu>
+        <LienMenu href="/admin/cours">Cours</LienMenu>
+        <LienMenu href="/admin/tests">Tests</LienMenu>
+        <LienMenu href="/admin/evaluations">Évaluations</LienMenu>
+        <LienMenu href="/admin/direct">Direct</LienMenu>
+        <LienMenu href="/club">Club</LienMenu>
+        <LienMenu href="/admin/avis">Avis</LienMenu>
         <LienMessages href="/admin/messages" />
       </nav>
       {children}

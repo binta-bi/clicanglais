@@ -1,5 +1,5 @@
 'use client'
-import Link from 'next/link'
+import LienMenu from '@/components/LienMenu'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -22,7 +22,7 @@ export default function LienMessages({ href, className }: { href: string; classN
   }, [])
 
   return (
-    <Link href={href} className={`inline-flex items-center whitespace-nowrap ${className ?? ""}`}>
+    <LienMenu href={href} className={`inline-flex items-center whitespace-nowrap ${className ?? ""}`}>
       Messages
       {non > 0 && (
         <span
@@ -32,6 +32,6 @@ export default function LienMessages({ href, className }: { href: string; classN
           {non}
         </span>
       )}
-    </Link>
+    </LienMenu>
   )
 }

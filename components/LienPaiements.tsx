@@ -1,5 +1,5 @@
 'use client'
-import Link from 'next/link'
+import LienMenu from '@/components/LienMenu'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -22,7 +22,7 @@ export default function LienPaiements({ href, className }: { href: string; class
   }, [])
 
   return (
-    <Link href={href} className={`inline-flex items-center whitespace-nowrap ${className ?? ''}`}>
+    <LienMenu href={href} className={`inline-flex items-center whitespace-nowrap ${className ?? ''}`}>
       Paiements
       {nb > 0 && (
         <span
@@ -32,6 +32,6 @@ export default function LienPaiements({ href, className }: { href: string; class
           {nb}
         </span>
       )}
-    </Link>
+    </LienMenu>
   )
 }

@@ -57,3 +57,11 @@ body {
 .menu-bouton:hover {
   background-color: var(--color-brand-deep);
 }
+/* Page en cours : le lien reste en couleur */
+.menu-liens a[aria-current='page'] {
+  color: var(--color-brand-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}

@@ -10,7 +10,6 @@ function ModifierCours() {
   const [introuvable, setIntrouvable] = useState(false)
   const [titre, setTitre] = useState('')
   const [description, setDescription] = useState('')
-  const [prix, setPrix] = useState('')
   const [programme, setProgramme] = useState('')
   const [publie, setPublie] = useState(false)
   const [nbLecons, setNbLecons] = useState(0)
@@ -22,7 +21,7 @@ function ModifierCours() {
     async function charger() {
       const { data: c } = await supabase
         .from('courses')
-        .select('title, description, price, programme, is_published')
+        .select('title, description, programme, is_published')
         .eq('id', id)
         .single()
       if (!c) {
@@ -32,7 +31,6 @@ function ModifierCours() {
       }
       setTitre(c.title || '')
       setDescription(c.description || '')
-      setPrix(String(c.price ?? 0))
       setProgramme(Array.isArray(c.programme) ? (c.programme as string[]).join('\n') : '')
       setPublie(!!c.is_published)
       const { count } = await supabase
@@ -49,18 +47,12 @@ function ModifierCours() {
     e.preventDefault()
     setMessage('')
     setErreur('')
-    const montant = Number(prix)
-    if (!Number.isFinite(montant) || montant < 0 || !Number.isInteger(montant)) {
-      setErreur('Le prix doit être un nombre entier en FCFA (0 ou plus).')
-      return
-    }
     setEnvoi(true)
     const { error } = await supabase
       .from('courses')
       .update({
         title: titre.trim(),
         description: description.trim(),
-        price: montant,
         programme: programme
           .split('\n')
           .map((l) => l.trim())
@@ -99,15 +91,6 @@ function ModifierCours() {
           Description
           <textarea
             value={description} rows={3} onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 rounded font-normal"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm font-medium">
-          Prix (FCFA)
-          <input
-            type="number" min={0} step={1} value={prix} required
-            onChange={(e) => setPrix(e.target.value)}
             className="border p-2 rounded font-normal"
           />
         </label>

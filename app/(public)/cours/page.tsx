@@ -2,71 +2,78 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { NOM_NIVEAU, type NiveauSlug } from '@/lib/tests'
 
-type Course = {
-  id: string
-  title: string
-  description: string
-  niveau: 'debutant' | 'intermediaire' | 'avance'
-  price: number
-}
+type Cours = { id: string; title: string; description: string | null; niveau: NiveauSlug; mois: number | null }
+type Filtre = 'tous' | NiveauSlug
 
-const niveaux = [
-  { value: 'tous', label: 'Tous' },
-  { value: 'debutant', label: 'Débutant' },
-  { value: 'intermediaire', label: 'Intermédiaire' },
-  { value: 'avance', label: 'Avancé' },
+const ORDRE: Record<string, number> = { debutant: 0, intermediaire: 1, avance: 2 }
+const FILTRES: { valeur: Filtre; nom: string }[] = [
+  { valeur: 'tous', nom: 'Tous' },
+  { valeur: 'debutant', nom: 'Débutant' },
+  { valeur: 'intermediaire', nom: 'Intermédiaire' },
+  { valeur: 'avance', nom: 'Avancé' },
 ]
 
-export default function Catalogue() {
-  const [courses, setCourses] = useState<Course[]>([])
-  const [filtre, setFiltre] = useState('tous')
-  const [loading, setLoading] = useState(true)
+// Les prix ne sont affichés que sur la page d'accueil.
+export default function PageCours() {
+  const [cours, setCours] = useState<Cours[]>([])
+  const [filtre, setFiltre] = useState<Filtre>('tous')
+  const [chargement, setChargement] = useState(true)
 
   useEffect(() => {
-    async function loadCourses() {
+    async function charger() {
       const { data } = await supabase
         .from('courses')
-        .select('id, title, description, niveau, price')
+        .select('id, title, description, niveau, mois')
         .eq('is_published', true)
-        .order('created_at')
-      setCourses(data || [])
-      setLoading(false)
+        .not('mois', 'is', null)
+      const liste = ((data as Cours[]) || []).sort(
+        (a, b) => (ORDRE[a.niveau] ?? 9) - (ORDRE[b.niveau] ?? 9) || (a.mois ?? 0) - (b.mois ?? 0),
+      )
+      setCours(liste)
+      setChargement(false)
     }
-    loadCourses()
+    charger()
   }, [])
 
-  const visibles =
-    filtre === 'tous' ? courses : courses.filter((c) => c.niveau === filtre)
+  const visibles = cours.filter((c) => filtre === 'tous' || c.niveau === filtre)
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 px-4 flex flex-col gap-6">
+    <div className="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-6">
       <h1 className="text-2xl font-bold">Nos cours</h1>
 
-      <div className="flex gap-2 flex-wrap">
-        {niveaux.map((n) => (
+      <div role="group" aria-label="Filtrer par niveau" className="flex flex-wrap gap-2">
+        {FILTRES.map((f) => (
           <button
-            key={n.value}
-            onClick={() => setFiltre(n.value)}
-            className={`px-3 py-1 rounded border ${
-              filtre === n.value ? 'bg-blue-900 text-white' : ''
+            key={f.valeur}
+            type="button"
+            onClick={() => setFiltre(f.valeur)}
+            aria-pressed={filtre === f.valeur}
+            className={`rounded-lg border px-4 py-2 font-medium ${
+              filtre === f.valeur ? 'border-[#1e3a8a] bg-[#1e3a8a] text-white' : 'border-[#2d3a6b] text-[#1a2250] hover:text-brand-deep'
             }`}
           >
-            {n.label}
+            {f.nom}
           </button>
         ))}
       </div>
 
-      {loading && <p>Chargement des cours...</p>}
-      {!loading && visibles.length === 0 && <p>Aucun cours pour ce niveau.</p>}
+      {chargement && <p role="status">Chargement...</p>}
+      {!chargement && visibles.length === 0 && (
+        <p className="rounded-2xl bg-mist p-5">Aucun cours disponible pour ce niveau pour l&apos;instant.</p>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {visibles.map((c) => (
-           <Link href={`/cours/${c.id}`} key={c.id} className="border rounded p-4 flex flex-col gap-2 hover:shadow">
+          <Link key={c.id} href={`/cours/${c.id}`} className="rounded-lg border border-[#2d3a6b] p-5 flex flex-col gap-2 hover:shadow">
             <h2 className="font-bold">{c.title}</h2>
-            <p className="text-sm">{c.description}</p>
-            <p className="text-sm text-gray-500">Niveau : {c.niveau}</p>
-            <p className="font-medium">{c.price.toLocaleString('fr-FR')} GNF</p>
+            {c.description && <p>{c.description}</p>}
+            <p className="text-sm text-gray-500">
+              Niveau {NOM_NIVEAU[c.niveau] ?? c.niveau}
+              {c.mois ? ` · Mois ${c.mois} sur 3` : ''}
+            </p>
+            <p className="font-medium text-brand-deep">Voir le cours →</p>
           </Link>
         ))}
       </div>

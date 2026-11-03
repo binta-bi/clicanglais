@@ -126,9 +126,14 @@ export default function MesCours() {
       </div>
 
       {!loading && achats.length > 0 && (
-        <Link href="/direct" className="rounded-2xl bg-mist p-5 font-medium hover:shadow">
-          Cours en direct et rediffusions →
-        </Link>
+        <div className="flex flex-col gap-3">
+          <Link href="/evaluations" className="rounded-2xl bg-mist p-5 font-medium hover:shadow">
+            Évaluations de fin de mois et de niveau →
+          </Link>
+          <Link href="/direct" className="rounded-2xl bg-mist p-5 font-medium hover:shadow">
+            Cours en direct et rediffusions →
+          </Link>
+        </div>
       )}
     </div>
   )

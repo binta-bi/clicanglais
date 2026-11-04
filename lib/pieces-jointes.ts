@@ -12,6 +12,9 @@ const MIME_FICHIERS: Record<string, string> = {
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   txt: 'text/plain',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  csv: 'text/csv',
 }
 const MIME_IMAGES: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -21,7 +24,7 @@ const MIME_IMAGES: Record<string, string> = {
   gif: 'image/gif',
 }
 
-export const ACCEPT_FICHIERS = 'image/*,.pdf,.doc,.docx,.txt'
+export const ACCEPT_FICHIERS = 'image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.csv'
 
 function extension(nom: string) {
   const i = nom.lastIndexOf('.')
@@ -70,7 +73,7 @@ export async function envoyerFichierChoisi(dossier: string, fichier: File): Prom
     const path = await televerser(dossier, fichier, ext, MIME_FICHIERS[ext])
     return { path, type: 'fichier', nom: fichier.name.slice(0, 120) }
   }
-  throw new Error('Format non accepté. Envoie une photo, un PDF, un document Word ou un fichier texte.')
+  throw new Error('Format non accepté. Envoie une photo, un PDF, un document Word, un fichier Excel ou un fichier texte.')
 }
 
 export async function envoyerVocal(dossier: string, blob: Blob): Promise<Piece> {

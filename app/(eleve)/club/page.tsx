@@ -18,7 +18,14 @@ type Message = {
   fichier_nom: string | null
 }
 type Exclu = { student_id: string; nom: string; email: string; motif: string | null }
-type Statut = 'chargement' | 'ok' | 'achat' | 'exclu'
+type Statut = 'chargement' | 'ok' | 'achat' | 'exclu' | 'niveau'
+type Niveau = 'debutant' | 'intermediaire' | 'avance'
+
+const NIVEAUX: { code: Niveau; nom: string }[] = [
+  { code: 'debutant', nom: 'Débutant' },
+  { code: 'intermediaire', nom: 'Intermédiaire' },
+  { code: 'avance', nom: 'Avancé' },
+]
 
 const MAX = 1000
 
@@ -31,6 +38,7 @@ export default function Club() {
   const [statut, setStatut] = useState<Statut>('chargement')
   const [moi, setMoi] = useState('')
   const [estProf, setEstProf] = useState(false)
+  const [niveau, setNiveau] = useState<Niveau>('debutant')
   const [messages, setMessages] = useState<Message[]>([])
   const [exclus, setExclus] = useState<Exclu[]>([])
   const [texte, setTexte] = useState('')
@@ -40,7 +48,7 @@ export default function Club() {
   const dernier = useRef('')
 
   const lire = useCallback(async () => {
-    const { data, error } = await supabase.rpc('club_lire')
+    const { data, error } = await supabase.rpc('club_lire', { p_niveau: estProf ? niveau : null })
     if (error) return
     const liste = (data as Message[]) || []
     const cle = liste.map((m) => m.id).join(',')
@@ -48,7 +56,7 @@ export default function Club() {
       dernier.current = cle
       setMessages(liste)
     }
-  }, [])
+  }, [estProf, niveau])
 
   const lireExclus = useCallback(async () => {
     const { data } = await supabase.rpc('prof_club_exclus')
@@ -67,26 +75,32 @@ export default function Club() {
       }
       const { data: profil } = await supabase.from('profiles').select('role').eq('id', user.id).single()
       const { data: st } = await supabase.rpc('club_statut')
+      const { data: monNiveau } = await supabase.rpc('club_mon_niveau')
       if (annule) return
       setMoi(user.id)
       const prof = profil?.role === 'professeur'
       setEstProf(prof)
+      if (monNiveau) setNiveau(monNiveau as Niveau)
       const s = (st as string) || 'achat'
-      setStatut(s === 'ok' || s === 'exclu' ? s : 'achat')
-      if (s === 'ok') {
-        await lire()
-        if (prof) await lireExclus()
-      }
+      setStatut(s === 'ok' || s === 'exclu' || s === 'niveau' ? s : 'achat')
+      if (s === 'ok' && prof) await lireExclus()
     }
     init()
+    return () => {
+      annule = true
+    }
+  }, [router, lireExclus])
+
+  // Lecture des messages : au chargement, au changement de niveau (professeur), puis toutes les 5 s
+  useEffect(() => {
+    if (statut !== 'ok') return
+    dernier.current = ''
+    lire()
     const t = setInterval(() => {
       if (document.visibilityState === 'visible') lire()
     }, 5000)
-    return () => {
-      annule = true
-      clearInterval(t)
-    }
-  }, [router, lire, lireExclus])
+    return () => clearInterval(t)
+  }, [statut, lire])
 
   useEffect(() => {
     fin.current?.scrollIntoView({ block: 'end' })
@@ -100,6 +114,7 @@ export default function Club() {
       p_fichier: piece?.path ?? null,
       p_type: piece?.type ?? null,
       p_nom: piece?.nom ?? null,
+      p_niveau: estProf ? niveau : null,
     })
     setEnvoi(false)
     if (error) {
@@ -152,6 +167,19 @@ export default function Club() {
       </p>
     )
 
+  if (statut === 'niveau')
+    return (
+      <div className="max-w-2xl mx-auto mt-10 px-4 flex flex-col gap-4">
+        <h1 className="text-2xl font-bold">Le club</h1>
+        <div className="rounded-2xl bg-mist p-5">
+          <p className="font-medium">Passe d&apos;abord le test de niveau pour entrer dans le club de ton niveau.</p>
+          <Link href="/niveau" className="btn-primary mt-4">
+            Passer le test de niveau
+          </Link>
+        </div>
+      </div>
+    )
+
   if (statut !== 'ok')
     return (
       <div className="max-w-2xl mx-auto mt-10 px-4 flex flex-col gap-4">
@@ -173,16 +201,35 @@ export default function Club() {
 
   return (
     <div className="max-w-2xl mx-auto mt-6 px-4 pb-10 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Le club</h1>
+      <h1 className="text-2xl font-bold">Le club : niveau {NIVEAUX.find((n) => n.code === niveau)?.nom}</h1>
+      {estProf && (
+        <div role="tablist" aria-label="Niveau du club" className="flex flex-wrap gap-2">
+          {NIVEAUX.map((n) => (
+            <button
+              key={n.code}
+              type="button"
+              role="tab"
+              aria-selected={n.code === niveau}
+              onClick={() => {
+                setMessages([])
+                setNiveau(n.code)
+              }}
+              className={`rounded-xl border px-4 py-2 text-sm font-medium ${n.code === niveau ? 'bg-brand-deep text-white' : ''}`}
+            >
+              {n.nom}
+            </button>
+          ))}
+        </div>
+      )}
       <p className="text-sm text-gray-600">
-        Échange avec les autres élèves et le professeur. Reste poli et ne partage pas d&apos;informations
+        Échange avec les autres élèves de ton niveau et le professeur. Reste poli et ne partage pas d&apos;informations
         personnelles (numéro de téléphone, mot de passe).
       </p>
 
       <div
         role="log"
         aria-live="polite"
-        aria-label="Messages du club"
+        aria-label={`Messages du club ${NIVEAUX.find((n) => n.code === niveau)?.nom}`}
         className="border rounded-2xl p-3 h-[55vh] overflow-y-auto flex flex-col gap-3"
       >
         {messages.length === 0 && <p className="text-gray-500 m-auto">Aucun message pour l&apos;instant. Lance la discussion !</p>}
@@ -232,7 +279,7 @@ export default function Club() {
           placeholder="Écris ton message..."
           className="border p-3 rounded-xl"
         />
-        <BoutonsPieces dossier="club" onPiece={envoyerPiece} desactive={envoi} />
+        <BoutonsPieces dossier={`club/${niveau}`} onPiece={envoyerPiece} desactive={envoi} />
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs text-gray-500">
             {texte.length} / {MAX}

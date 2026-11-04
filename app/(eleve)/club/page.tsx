@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
   id: string
@@ -11,6 +13,9 @@ type Message = {
   est_prof: boolean
   contenu: string
   created_at: string
+  fichier_path: string | null
+  fichier_type: TypePiece | null
+  fichier_nom: string | null
 }
 type Exclu = { student_id: string; nom: string; email: string; motif: string | null }
 type Statut = 'chargement' | 'ok' | 'achat' | 'exclu'
@@ -87,12 +92,15 @@ export default function Club() {
     fin.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
 
-  async function envoyer(e: React.FormEvent) {
-    e.preventDefault()
-    if (!texte.trim()) return
+  async function envoyerMessage(contenu: string, piece?: Piece) {
     setErreur('')
     setEnvoi(true)
-    const { error } = await supabase.rpc('club_envoyer', { p_contenu: texte })
+    const { error } = await supabase.rpc('club_envoyer', {
+      p_contenu: contenu,
+      p_fichier: piece?.path ?? null,
+      p_type: piece?.type ?? null,
+      p_nom: piece?.nom ?? null,
+    })
     setEnvoi(false)
     if (error) {
       setErreur(error.message)
@@ -101,6 +109,16 @@ export default function Club() {
     }
     setTexte('')
     lire()
+  }
+
+  async function envoyer(e: React.FormEvent) {
+    e.preventDefault()
+    if (!texte.trim()) return
+    await envoyerMessage(texte)
+  }
+
+  async function envoyerPiece(piece: Piece) {
+    await envoyerMessage(texte, piece)
   }
 
   async function supprimer(m: Message) {
@@ -178,9 +196,12 @@ export default function Club() {
                 {' · '}
                 {heure(m.created_at)}
               </p>
-              <p className={`mt-1 rounded-2xl px-3 py-2 whitespace-pre-wrap break-words ${mien ? 'bg-mist' : 'border'}`}>
-                {m.contenu}
-              </p>
+              <div className={`mt-1 flex flex-col gap-2 rounded-2xl px-3 py-2 break-words ${mien ? 'bg-mist' : 'border'}`}>
+                {m.fichier_path && m.fichier_type && (
+                  <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                )}
+                {m.contenu && <p className="whitespace-pre-wrap">{m.contenu}</p>}
+              </div>
               <div className="mt-1 flex gap-3 text-xs">
                 {(mien || estProf) && (
                   <button type="button" onClick={() => supprimer(m)} className="text-red-700 underline">
@@ -211,6 +232,7 @@ export default function Club() {
           placeholder="Écris ton message..."
           className="border p-3 rounded-xl"
         />
+        <BoutonsPieces dossier="club" onPiece={envoyerPiece} desactive={envoi} />
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs text-gray-500">
             {texte.length} / {MAX}

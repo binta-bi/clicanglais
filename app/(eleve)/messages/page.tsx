@@ -3,12 +3,17 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
   id: string
   sender_role: 'eleve' | 'professeur'
   content: string
   created_at: string
+  fichier_path: string | null
+  fichier_type: TypePiece | null
+  fichier_nom: string | null
 }
 
 const MAX = 1000
@@ -36,7 +41,7 @@ export default function MessagesEleve() {
   const rafraichir = useCallback(async () => {
     const { data } = await supabase
       .from('messages')
-      .select('id, sender_role, content, created_at')
+      .select('id, sender_role, content, created_at, fichier_path, fichier_type, fichier_nom')
       .order('created_at')
     setMessages((data as Message[]) || [])
     await supabase.rpc('mark_read')
@@ -71,14 +76,16 @@ export default function MessagesEleve() {
     fin.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
 
-  async function envoyer(e: React.FormEvent) {
-    e.preventDefault()
-    if (!userId || !texte.trim()) return
+  async function envoyerMessage(contenu: string, piece?: Piece) {
+    if (!userId) return
     setErreur('')
     setEnvoi(true)
-    const { error } = await supabase
-      .from('messages')
-      .insert({ student_id: userId, sender_role: 'eleve', content: texte.trim() })
+    const { error } = await supabase.from('messages').insert({
+      student_id: userId,
+      sender_role: 'eleve',
+      content: contenu.trim(),
+      ...(piece ? { fichier_path: piece.path, fichier_type: piece.type, fichier_nom: piece.nom } : {}),
+    })
     setEnvoi(false)
     if (error) {
       setErreur(
@@ -90,6 +97,16 @@ export default function MessagesEleve() {
     }
     setTexte('')
     rafraichir()
+  }
+
+  async function envoyer(e: React.FormEvent) {
+    e.preventDefault()
+    if (!texte.trim()) return
+    await envoyerMessage(texte)
+  }
+
+  async function envoyerPiece(piece: Piece) {
+    await envoyerMessage(texte, piece)
   }
 
   if (!pret) {
@@ -121,14 +138,19 @@ export default function MessagesEleve() {
             {messages.length === 0 && <p className="text-ink/70">Aucun message pour l&apos;instant. Écris au professeur ci-dessous.</p>}
             {messages.map((m) => (
               <div key={m.id} className={`flex flex-col ${m.sender_role === 'eleve' ? 'items-end' : 'items-start'}`}>
-                <p
-                  className={`max-w-[85%] whitespace-pre-line break-words rounded-2xl px-4 py-2 ${
+                <div
+                  className={`flex max-w-[85%] flex-col gap-2 break-words rounded-2xl px-4 py-2 ${
                     m.sender_role === 'eleve' ? 'bg-navy text-white' : 'bg-mist'
                   }`}
                 >
                   <span className="sr-only">{m.sender_role === 'eleve' ? 'Toi : ' : 'Professeur : '}</span>
-                  {m.content}
-                </p>
+                  {m.fichier_path && m.fichier_type && (
+                    <div className="rounded-xl bg-white p-1 text-ink">
+                      <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                    </div>
+                  )}
+                  {m.content && <p className="whitespace-pre-line">{m.content}</p>}
+                </div>
                 <p className="mt-1 text-xs text-ink/60">{heure(m.created_at)}</p>
               </div>
             ))}
@@ -155,6 +177,7 @@ export default function MessagesEleve() {
                   {erreur}
                 </p>
               )}
+              <BoutonsPieces dossier={`messages/${userId}`} onPiece={envoyerPiece} desactive={envoi} />
               <button type="submit" disabled={envoi || !texte.trim()} className="btn-primary w-fit disabled:opacity-50">
                 {envoi ? 'Envoi...' : 'Envoyer'}
               </button>

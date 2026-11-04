@@ -1,6 +1,8 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Conversation = {
   student_id: string
@@ -10,7 +12,15 @@ type Conversation = {
   last_sender: 'eleve' | 'professeur'
   unread: number
 }
-type Message = { id: string; sender_role: 'eleve' | 'professeur'; content: string; created_at: string }
+type Message = {
+  id: string
+  sender_role: 'eleve' | 'professeur'
+  content: string
+  created_at: string
+  fichier_path: string | null
+  fichier_type: TypePiece | null
+  fichier_nom: string | null
+}
 
 const MAX = 1000
 
@@ -39,7 +49,7 @@ export default function AdminMessages() {
     async (studentId: string) => {
       const { data } = await supabase
         .from('messages')
-        .select('id, sender_role, content, created_at')
+        .select('id, sender_role, content, created_at, fichier_path, fichier_type, fichier_nom')
         .eq('student_id', studentId)
         .order('created_at')
       setMessages((data as Message[]) || [])
@@ -70,14 +80,16 @@ export default function AdminMessages() {
     chargerListe()
   }
 
-  async function repondre(e: React.FormEvent) {
-    e.preventDefault()
-    if (!choisi || !texte.trim()) return
+  async function envoyerMessage(contenu: string, piece?: Piece) {
+    if (!choisi) return
     setErreur('')
     setEnvoi(true)
-    const { error } = await supabase
-      .from('messages')
-      .insert({ student_id: choisi, sender_role: 'professeur', content: texte.trim() })
+    const { error } = await supabase.from('messages').insert({
+      student_id: choisi,
+      sender_role: 'professeur',
+      content: contenu.trim(),
+      ...(piece ? { fichier_path: piece.path, fichier_type: piece.type, fichier_nom: piece.nom } : {}),
+    })
     setEnvoi(false)
     if (error) {
       setErreur(error.message)
@@ -86,6 +98,16 @@ export default function AdminMessages() {
     setTexte('')
     chargerFil(choisi)
     chargerListe()
+  }
+
+  async function repondre(e: React.FormEvent) {
+    e.preventDefault()
+    if (!texte.trim()) return
+    await envoyerMessage(texte)
+  }
+
+  async function envoyerPiece(piece: Piece) {
+    await envoyerMessage(texte, piece)
   }
 
   const eleve = conversations.find((c) => c.student_id === choisi)
@@ -120,7 +142,7 @@ export default function AdminMessages() {
                 </span>
                 <span className="mt-1 block truncate text-sm text-gray-500">
                   {c.last_sender === 'professeur' ? 'Toi : ' : ''}
-                  {c.last_content}
+                  {c.last_content || '📎 Pièce jointe'}
                 </span>
               </button>
             </li>
@@ -136,13 +158,18 @@ export default function AdminMessages() {
             <div className="flex max-h-[28rem] min-h-40 flex-col gap-3 overflow-y-auto rounded border p-4" aria-live="polite">
               {messages.map((m) => (
                 <div key={m.id} className={`flex flex-col ${m.sender_role === 'professeur' ? 'items-end' : 'items-start'}`}>
-                  <p
-                    className={`max-w-[85%] whitespace-pre-line break-words rounded-2xl px-4 py-2 ${
+                  <div
+                    className={`flex max-w-[85%] flex-col gap-2 break-words rounded-2xl px-4 py-2 ${
                       m.sender_role === 'professeur' ? 'bg-[#2d3a6b] text-white' : 'bg-gray-100'
                     }`}
                   >
-                    {m.content}
-                  </p>
+                    {m.fichier_path && m.fichier_type && (
+                      <div className="rounded-xl bg-white p-1 text-black">
+                        <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                      </div>
+                    )}
+                    {m.content && <p className="whitespace-pre-line">{m.content}</p>}
+                  </div>
                   <p className="mt-1 text-xs text-gray-500">{heure(m.created_at)}</p>
                 </div>
               ))}
@@ -159,6 +186,7 @@ export default function AdminMessages() {
                   className="rounded border p-2"
                 />
               </label>
+              <BoutonsPieces dossier={`messages/${choisi}`} onPiece={envoyerPiece} desactive={envoi} />
               <button
                 type="submit"
                 disabled={envoi || !texte.trim()}

@@ -39,6 +39,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <LienMenu href="/admin">Accueil</LienMenu>
         <LienPaiements href="/admin/paiements" />
         <LienMenu href="/admin/statistiques">Statistiques</LienMenu>
+        <LienMenu href="/admin/eleves">Élèves</LienMenu>
+        <LienMenu href="/admin/visites">Visites</LienMenu>
         <LienMenu href="/admin/cours">Cours</LienMenu>
         <LienMenu href="/admin/tests">Tests</LienMenu>
         <LienMenu href="/admin/evaluations">Évaluations</LienMenu>

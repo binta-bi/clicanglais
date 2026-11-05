@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { normaliserTelephone } from '@/lib/telephone'
+import { composerTelephone } from '@/lib/telephone'
+import { PAYS, drapeau } from '@/lib/pays'
 
 export default function Inscription() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [indicatif, setIndicatif] = useState('CI')
   const [telephone, setTelephone] = useState('')
   const [erreur, setErreur] = useState('')
   const [message, setMessage] = useState('')
@@ -19,9 +21,10 @@ export default function Inscription() {
     e.preventDefault()
     setErreur('')
     setMessage('')
-    const tel = normaliserTelephone(telephone)
+    const pays = PAYS.find((p) => p.iso === indicatif) || PAYS[0]
+    const tel = composerTelephone(pays.indicatif, telephone)
     if (!tel) {
-      setErreur('Numéro WhatsApp invalide. Écris-le avec l’indicatif du pays, par exemple +225 07 07 07 07 07.')
+      setErreur('Numéro WhatsApp invalide. Choisis ton pays et écris ton numéro, par exemple 07 07 07 07 07.')
       return
     }
     setEnvoi(true)
@@ -49,23 +52,38 @@ export default function Inscription() {
         Nom complet
         <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={champ} required />
       </label>
-      <label className="flex flex-col gap-1 font-medium">
-        Numéro WhatsApp
-        <input
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          value={telephone}
-          onChange={(e) => setTelephone(e.target.value)}
-          placeholder="+225 07 07 07 07 07"
-          className={champ}
-          required
-          aria-describedby="aide-tel"
-        />
+      <div role="group" aria-labelledby="lib-tel" className="flex flex-col gap-1 font-medium">
+        <span id="lib-tel">Numéro WhatsApp</span>
+        <div className="flex gap-2">
+          <select
+            value={indicatif}
+            onChange={(e) => setIndicatif(e.target.value)}
+            aria-label="Pays"
+            className={`${champ} w-40 shrink-0 px-2`}
+          >
+            {PAYS.map((p) => (
+              <option key={p.iso} value={p.iso}>
+                {drapeau(p.iso)} +{p.indicatif} {p.nom}
+              </option>
+            ))}
+          </select>
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            placeholder="07 07 07 07 07"
+            aria-label="Numéro de téléphone"
+            className={`${champ} min-w-0 flex-1`}
+            required
+            aria-describedby="aide-tel"
+          />
+        </div>
         <span id="aide-tel" className="text-sm font-normal text-ink/70">
-          Avec l’indicatif du pays (+225 pour la Côte d’Ivoire). L'équipe ClicAnglais l’utilisera pour vous contacter.
+          Choisis ton pays, puis écris ton numéro. L’équipe ClicAnglais l’utilisera pour te contacter.
         </span>
-      </label>
+      </div>
       <label className="flex flex-col gap-1 font-medium">
         Email
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={champ} required />

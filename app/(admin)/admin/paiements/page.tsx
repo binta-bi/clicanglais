@@ -16,6 +16,8 @@ type Paiement = {
   traite_le: string | null
 }
 
+type Offert = { eleve: string; email: string | null; acces: string; offert_le: string }
+
 type CoursMois = { id: string; title: string; niveau: string; mois: number }
 
 const ORDRE: Record<string, number> = { debutant: 0, intermediaire: 1, avance: 2 }
@@ -134,7 +136,7 @@ function CartePaiement({ p, onChange }: { p: Paiement; onChange: () => void }) {
   )
 }
 
-function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void }) {
+function DonnerAcces({ cours, onFini, offert = false }: { cours: CoursMois[]; onFini: () => void; offert?: boolean }) {
   const [email, setEmail] = useState('')
   const [type, setType] = useState<'mois' | 'niveau'>('mois')
   const [coursId, setCoursId] = useState('')
@@ -151,9 +153,9 @@ function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void
       setErreur('Choisis un cours.')
       return
     }
-    if (!confirm(`Donner cet accès à ${email} ?`)) return
+    if (!confirm(offert ? `Offrir cet accès gratuitement à ${email} ?\n\nAucun argent ne sera compté dans les statistiques.` : `Donner cet accès à ${email} ?`)) return
     setEnvoi(true)
-    const { data, error } = await supabase.rpc('prof_donner_acces', {
+    const { data, error } = await supabase.rpc(offert ? 'prof_offrir_acces' : 'prof_donner_acces', {
       p_email: email,
       p_course: type === 'mois' ? coursId : null,
       p_niveau: type === 'niveau' ? niveau : null,
@@ -171,7 +173,9 @@ function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void
   return (
     <form onSubmit={donner} className="flex max-w-xl flex-col gap-3 rounded-2xl border-2 border-line p-4">
       <p className="text-sm">
-        Pour un élève qui a déjà payé en dehors du site. Il doit d&apos;abord avoir créé son compte avec cet email.
+        {offert
+          ? 'Pour un proche ou un invité qui n’a pas payé. Aucun argent n’est compté dans les statistiques. La personne doit d’abord avoir créé son compte avec cet email.'
+          : 'Pour un élève qui a déjà payé en dehors du site. L’argent est compté dans les statistiques. Il doit d’abord avoir créé son compte avec cet email.'}
       </p>
       <label className="flex flex-col gap-1 text-sm font-medium">
         Email de l&apos;élève
@@ -183,10 +187,10 @@ function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void
       <fieldset className="flex flex-wrap gap-4 text-sm">
         <legend className="mb-1 font-medium">Type d&apos;accès</legend>
         <label className="flex items-center gap-2">
-          <input type="radio" name="type" checked={type === 'mois'} onChange={() => setType('mois')} /> Un mois
+          <input type="radio" name={offert ? 'type-offert' : 'type'} checked={type === 'mois'} onChange={() => setType('mois')} /> Un mois
         </label>
         <label className="flex items-center gap-2">
-          <input type="radio" name="type" checked={type === 'niveau'} onChange={() => setType('niveau')} /> Niveau complet
+          <input type="radio" name={offert ? 'type-offert' : 'type'} checked={type === 'niveau'} onChange={() => setType('niveau')} /> Niveau complet
         </label>
       </fieldset>
       {type === 'mois' ? (
@@ -218,7 +222,7 @@ function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void
       {erreur && <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">{erreur}</p>}
       {message && <p role="status" className="rounded-xl bg-mist p-3 font-medium">{message}</p>}
       <button type="submit" disabled={envoi} className="btn-primary self-start disabled:opacity-50">
-        {envoi ? 'Envoi...' : 'Donner l’accès'}
+        {envoi ? 'Envoi...' : offert ? 'Offrir l’accès' : 'Donner l’accès'}
       </button>
     </form>
   )
@@ -227,6 +231,7 @@ function DonnerAcces({ cours, onFini }: { cours: CoursMois[]; onFini: () => void
 export default function PagePaiements() {
   const [liste, setListe] = useState<Paiement[]>([])
   const [cours, setCours] = useState<CoursMois[]>([])
+  const [offerts, setOfferts] = useState<Offert[]>([])
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState('')
 
@@ -237,6 +242,8 @@ export default function PagePaiements() {
       setErreur('')
       setListe((data as Paiement[]) || [])
     }
+    const { data: off } = await supabase.rpc('prof_acces_offerts')
+    setOfferts((off as Offert[]) || [])
     const { data: c } = await supabase
       .from('courses')
       .select('id, title, niveau, mois')
@@ -289,6 +296,25 @@ export default function PagePaiements() {
           Donner un accès directement
         </h2>
         <DonnerAcces cours={cours} onFini={charger} />
+      </section>
+
+      <section aria-labelledby="pa-offrir" className="flex flex-col gap-4">
+        <h2 id="pa-offrir" className="text-xl font-bold">
+          Offrir un accès (gratuit)
+        </h2>
+        <DonnerAcces cours={cours} onFini={charger} offert />
+        {offerts.length > 0 && (
+          <div>
+            <h3 className="mb-2 font-bold">Accès offerts ({offerts.length})</h3>
+            <ul className="flex flex-col gap-1 text-sm">
+              {offerts.map((o, i) => (
+                <li key={i}>
+                  <strong>{o.eleve}</strong> ({o.email}) : {o.acces}, le {quand(o.offert_le)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="pa-traites" className="flex flex-col gap-4">

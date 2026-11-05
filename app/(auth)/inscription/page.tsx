@@ -63,7 +63,7 @@ export default function Inscription() {
           aria-describedby="aide-tel"
         />
         <span id="aide-tel" className="text-sm font-normal text-ink/70">
-          Avec l’indicatif du pays (+225 pour la Côte d’Ivoire). Le professeur l’utilisera pour te contacter.
+          Avec l’indicatif du pays (+225 pour la Côte d’Ivoire). L'équipe ClicAnglais l’utilisera pour vous contacter.
         </span>
       </label>
       <label className="flex flex-col gap-1 font-medium">

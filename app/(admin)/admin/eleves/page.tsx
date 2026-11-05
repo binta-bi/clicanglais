@@ -24,13 +24,61 @@ const tel = (t: string | null) => (t ? `="${t}"` : '')
 function csv(eleves: Eleve[]) {
   const champ = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`
   const lignes = [
-    ['Nom', 'Email', 'Téléphone WhatsApp', 'Niveau', 'Inscrit le', 'Dernière connexion', 'Cours achetés'].map(champ).join(';'),
+    ['Nom', 'Email', 'Téléphone WhatsApp', 'Niveau', 'Inscrit le', 'Dernière connexion', 'Cours achetés', 'Statut'].map(champ).join(';'),
     ...eleves.map((e) =>
-      [e.nom, e.email, tel(e.telephone), nomNiveau(e.niveau), date(e.inscrit_le), date(e.derniere_connexion), e.nb_achats].map(champ).join(';')
+      [e.nom, e.email, tel(e.telephone), nomNiveau(e.niveau), date(e.inscrit_le), date(e.derniere_connexion), e.nb_achats, e.nb_achats > 0 ? 'Élève' : 'Inscrit'].map(champ).join(';')
     ),
   ]
   // BOM + point-virgule : Excel en français ouvre le fichier correctement
   return '﻿' + lignes.join('\r\n')
+}
+
+function Tableau({ lignes, vide }: { lignes: Eleve[]; vide: string }) {
+  if (lignes.length === 0) return <p className="text-gray-500">{vide}</p>
+  return (
+    <div className="overflow-x-auto rounded border">
+      <table className="w-full min-w-[48rem] text-left text-sm">
+        <thead className="bg-gray-50 text-gray-600">
+          <tr>
+            <th scope="col" className="px-3 py-2 font-medium">Nom</th>
+            <th scope="col" className="px-3 py-2 font-medium">Email</th>
+            <th scope="col" className="px-3 py-2 font-medium">WhatsApp</th>
+            <th scope="col" className="px-3 py-2 font-medium">Niveau</th>
+            <th scope="col" className="px-3 py-2 font-medium">Inscrit le</th>
+            <th scope="col" className="px-3 py-2 font-medium">Dernière connexion</th>
+            <th scope="col" className="px-3 py-2 font-medium">Cours achetés</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lignes.map((e) => (
+            <tr key={e.id} className="border-t">
+              <th scope="row" className="px-3 py-2 font-medium">{e.nom}</th>
+              <td className="break-all px-3 py-2">{e.email}</td>
+              <td className="px-3 py-2 whitespace-nowrap">
+                {e.telephone ? (
+                  <a
+                    href={`https://wa.me/${e.telephone.slice(1)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                    aria-label={`Écrire à ${e.nom} sur WhatsApp (${e.telephone})`}
+                  >
+                    {e.telephone}
+                  </a>
+                ) : (
+                  '—'
+                )}
+              </td>
+              <td className="px-3 py-2">{nomNiveau(e.niveau)}</td>
+              <td className="px-3 py-2">{date(e.inscrit_le)}</td>
+              <td className="px-3 py-2">{date(e.derniere_connexion)}</td>
+              <td className="px-3 py-2 tabular-nums">{e.nb_achats}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }
 
 export default function Eleves() {
@@ -61,6 +109,9 @@ export default function Eleves() {
       (e) => e.nom.toLowerCase().includes(q) || e.email.toLowerCase().includes(q) || (e.telephone || '').includes(q.replace(/[\s().-]/g, ''))
     )
   }, [eleves, recherche])
+
+  const avecAcces = filtres.filter((e) => e.nb_achats > 0)
+  const sansAcces = filtres.filter((e) => e.nb_achats === 0)
 
   function exporter() {
     const blob = new Blob([csv(filtres)], { type: 'text/csv;charset=utf-8' })
@@ -113,47 +164,17 @@ export default function Eleves() {
           {filtres.length === 0 ? (
             <p className="text-gray-500">{eleves.length === 0 ? 'Aucun élève inscrit pour l’instant.' : 'Aucun résultat.'}</p>
           ) : (
-            <div className="overflow-x-auto rounded border">
-              <table className="w-full min-w-[48rem] text-left text-sm">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th scope="col" className="px-3 py-2 font-medium">Nom</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Email</th>
-                    <th scope="col" className="px-3 py-2 font-medium">WhatsApp</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Niveau</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Inscrit le</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Dernière connexion</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Cours achetés</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtres.map((e) => (
-                    <tr key={e.id} className="border-t">
-                      <th scope="row" className="px-3 py-2 font-medium">{e.nom}</th>
-                      <td className="break-all px-3 py-2">{e.email}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">
-                        {e.telephone ? (
-                          <a
-                            href={`https://wa.me/${e.telephone.slice(1)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline"
-                            aria-label={`Écrire à ${e.nom} sur WhatsApp (${e.telephone})`}
-                          >
-                            {e.telephone}
-                          </a>
-                        ) : (
-                          '—'
-                        )}
-                      </td>
-                      <td className="px-3 py-2">{nomNiveau(e.niveau)}</td>
-                      <td className="px-3 py-2">{date(e.inscrit_le)}</td>
-                      <td className="px-3 py-2">{date(e.derniere_connexion)}</td>
-                      <td className="px-3 py-2 tabular-nums">{e.nb_achats}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-8">
+              <section aria-labelledby="t-eleves" className="flex flex-col gap-2">
+                <h2 id="t-eleves" className="text-lg font-bold">Élèves ({avecAcces.length})</h2>
+                <p className="text-sm text-gray-600">Inscrits qui ont accès à au moins un cours.</p>
+                <Tableau lignes={avecAcces} vide="Aucun élève avec accès pour l’instant." />
+              </section>
+              <section aria-labelledby="t-inscrits" className="flex flex-col gap-2">
+                <h2 id="t-inscrits" className="text-lg font-bold">Inscrits ({sansAcces.length})</h2>
+                <p className="text-sm text-gray-600">Inscrits sans accès à un cours pour l’instant.</p>
+                <Tableau lignes={sansAcces} vide="Aucun inscrit sans accès." />
+              </section>
             </div>
           )}
         </>

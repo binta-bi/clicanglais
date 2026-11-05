@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { normaliserTelephone } from '@/lib/telephone'
 
 export default function Inscription() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [telephone, setTelephone] = useState('')
   const [erreur, setErreur] = useState('')
   const [message, setMessage] = useState('')
   const [envoi, setEnvoi] = useState(false)
@@ -17,11 +19,16 @@ export default function Inscription() {
     e.preventDefault()
     setErreur('')
     setMessage('')
+    const tel = normaliserTelephone(telephone)
+    if (!tel) {
+      setErreur('Numéro WhatsApp invalide. Écris-le avec l’indicatif du pays, par exemple +225 07 07 07 07 07.')
+      return
+    }
     setEnvoi(true)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: { data: { full_name: fullName, telephone: tel } },
     })
     setEnvoi(false)
     if (error) {
@@ -41,6 +48,23 @@ export default function Inscription() {
       <label className="flex flex-col gap-1 font-medium">
         Nom complet
         <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={champ} required />
+      </label>
+      <label className="flex flex-col gap-1 font-medium">
+        Numéro WhatsApp
+        <input
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          value={telephone}
+          onChange={(e) => setTelephone(e.target.value)}
+          placeholder="+225 07 07 07 07 07"
+          className={champ}
+          required
+          aria-describedby="aide-tel"
+        />
+        <span id="aide-tel" className="text-sm font-normal text-ink/70">
+          Avec l’indicatif du pays (+225 pour la Côte d’Ivoire). Le professeur l’utilisera pour te contacter.
+        </span>
       </label>
       <label className="flex flex-col gap-1 font-medium">
         Email

@@ -6,6 +6,7 @@ type Eleve = {
   id: string
   nom: string
   email: string
+  telephone: string | null
   niveau: string | null
   inscrit_le: string
   derniere_connexion: string | null
@@ -17,12 +18,15 @@ const nomNiveau = (n: string | null) => (n ? NIVEAUX[n] || n : 'Pas encore')
 const date = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Jamais'
 
+// Le numéro est écrit sous forme ="+225..." pour qu'Excel le garde tel quel (sans le transformer en nombre)
+const tel = (t: string | null) => (t ? `="${t}"` : '')
+
 function csv(eleves: Eleve[]) {
   const champ = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`
   const lignes = [
-    ['Nom', 'Email', 'Niveau', 'Inscrit le', 'Dernière connexion', 'Cours achetés'].map(champ).join(';'),
+    ['Nom', 'Email', 'Téléphone WhatsApp', 'Niveau', 'Inscrit le', 'Dernière connexion', 'Cours achetés'].map(champ).join(';'),
     ...eleves.map((e) =>
-      [e.nom, e.email, nomNiveau(e.niveau), date(e.inscrit_le), date(e.derniere_connexion), e.nb_achats].map(champ).join(';')
+      [e.nom, e.email, tel(e.telephone), nomNiveau(e.niveau), date(e.inscrit_le), date(e.derniere_connexion), e.nb_achats].map(champ).join(';')
     ),
   ]
   // BOM + point-virgule : Excel en français ouvre le fichier correctement
@@ -53,7 +57,9 @@ export default function Eleves() {
   const filtres = useMemo(() => {
     const q = recherche.trim().toLowerCase()
     if (!q) return eleves
-    return eleves.filter((e) => e.nom.toLowerCase().includes(q) || e.email.toLowerCase().includes(q))
+    return eleves.filter(
+      (e) => e.nom.toLowerCase().includes(q) || e.email.toLowerCase().includes(q) || (e.telephone || '').includes(q.replace(/[\s().-]/g, ''))
+    )
   }, [eleves, recherche])
 
   function exporter() {
@@ -80,7 +86,7 @@ export default function Eleves() {
         <>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <label className="flex flex-col gap-1 text-sm">
-              Rechercher (nom ou email)
+              Rechercher (nom, email ou numéro)
               <input
                 type="search"
                 value={recherche}
@@ -108,11 +114,12 @@ export default function Eleves() {
             <p className="text-gray-500">{eleves.length === 0 ? 'Aucun élève inscrit pour l’instant.' : 'Aucun résultat.'}</p>
           ) : (
             <div className="overflow-x-auto rounded border">
-              <table className="w-full min-w-[40rem] text-left text-sm">
+              <table className="w-full min-w-[48rem] text-left text-sm">
                 <thead className="bg-gray-50 text-gray-600">
                   <tr>
                     <th scope="col" className="px-3 py-2 font-medium">Nom</th>
                     <th scope="col" className="px-3 py-2 font-medium">Email</th>
+                    <th scope="col" className="px-3 py-2 font-medium">WhatsApp</th>
                     <th scope="col" className="px-3 py-2 font-medium">Niveau</th>
                     <th scope="col" className="px-3 py-2 font-medium">Inscrit le</th>
                     <th scope="col" className="px-3 py-2 font-medium">Dernière connexion</th>
@@ -124,6 +131,21 @@ export default function Eleves() {
                     <tr key={e.id} className="border-t">
                       <th scope="row" className="px-3 py-2 font-medium">{e.nom}</th>
                       <td className="break-all px-3 py-2">{e.email}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        {e.telephone ? (
+                          <a
+                            href={`https://wa.me/${e.telephone.slice(1)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                            aria-label={`Écrire à ${e.nom} sur WhatsApp (${e.telephone})`}
+                          >
+                            {e.telephone}
+                          </a>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
                       <td className="px-3 py-2">{nomNiveau(e.niveau)}</td>
                       <td className="px-3 py-2">{date(e.inscrit_le)}</td>
                       <td className="px-3 py-2">{date(e.derniere_connexion)}</td>

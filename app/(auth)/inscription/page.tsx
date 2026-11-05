@@ -21,7 +21,7 @@ export default function Inscription() {
     e.preventDefault()
     setErreur('')
     setMessage('')
-    const pays = PAYS.find((p) => p.iso === indicatif) || PAYS[0]
+    const pays = PAYS.find((p) => p.iso === indicatif)!
     const tel = composerTelephone(pays.indicatif, telephone)
     if (!tel) {
       setErreur('Numéro WhatsApp invalide. Choisis ton pays et écris ton numéro, par exemple 07 07 07 07 07.')

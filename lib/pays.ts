@@ -1,5 +1,5 @@
 // Pays proposés pour le numéro WhatsApp : [code ISO, nom, indicatif]
-// Les pays d'Afrique de l'Ouest et centrale sont en premier, la Côte d'Ivoire par défaut.
+// Liste triée par ordre alphabétique (français) ; la Côte d'Ivoire reste sélectionnée par défaut dans le formulaire.
 export type Pays = { iso: string; nom: string; indicatif: string }
 
 const LISTE: [string, string, string][] = [
@@ -62,7 +62,9 @@ const LISTE: [string, string, string][] = [
   ['IN', 'Inde', '91'],
 ]
 
-export const PAYS: Pays[] = LISTE.map(([iso, nom, indicatif]) => ({ iso, nom, indicatif }))
+export const PAYS: Pays[] = LISTE.map(([iso, nom, indicatif]) => ({ iso, nom, indicatif })).sort((a, b) =>
+  a.nom.localeCompare(b.nom, 'fr')
+)
 
 // Drapeau en emoji à partir du code ISO (ex. CI -> 🇨🇮)
 export const drapeau = (iso: string) =>

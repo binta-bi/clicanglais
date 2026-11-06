@@ -10,7 +10,7 @@ export default function Inscription() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [indicatif, setIndicatif] = useState('CI')
+  const [indicatif, setIndicatif] = useState('')
   const [telephone, setTelephone] = useState('')
   const [erreur, setErreur] = useState('')
   const [message, setMessage] = useState('')
@@ -21,10 +21,14 @@ export default function Inscription() {
     e.preventDefault()
     setErreur('')
     setMessage('')
-    const pays = PAYS.find((p) => p.iso === indicatif)!
+    const pays = PAYS.find((p) => p.iso === indicatif)
+    if (!pays) {
+      setErreur('Choisis ton pays dans la liste avant d’écrire ton numéro.')
+      return
+    }
     const tel = composerTelephone(pays.indicatif, telephone)
     if (!tel) {
-      setErreur('Numéro WhatsApp invalide. Choisis ton pays et écris ton numéro, par exemple 07 07 07 07 07.')
+      setErreur('Numéro WhatsApp invalide. Choisis ton pays et écris ton numéro.')
       return
     }
     setEnvoi(true)
@@ -60,7 +64,11 @@ export default function Inscription() {
             onChange={(e) => setIndicatif(e.target.value)}
             aria-label="Pays"
             className={`${champ} w-40 shrink-0 px-2`}
+            required
           >
+            <option value="" disabled>
+              Choisis ton pays
+            </option>
             {PAYS.map((p) => (
               <option key={p.iso} value={p.iso}>
                 {drapeau(p.iso)} +{p.indicatif} {p.nom}
@@ -73,7 +81,7 @@ export default function Inscription() {
             autoComplete="tel-national"
             value={telephone}
             onChange={(e) => setTelephone(e.target.value)}
-            placeholder=""
+            placeholder="00 00 00 00 00"
             aria-label="Numéro de téléphone"
             className={`${champ} min-w-0 flex-1`}
             required

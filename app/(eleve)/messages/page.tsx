@@ -31,12 +31,14 @@ export default function MessagesEleve() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
-  const [peutEcrire, setPeutEcrire] = useState(false)
+  const [aAchete, setAAchete] = useState(false)
   const [pret, setPret] = useState(false)
   const [texte, setTexte] = useState('')
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
   const fin = useRef<HTMLDivElement>(null)
+  // Un élève sans cours peut répondre si le professeur lui a écrit en premier
+  const peutEcrire = aAchete || messages.some((m) => m.sender_role === 'professeur')
 
   const rafraichir = useCallback(async () => {
     const { data } = await supabase
@@ -61,7 +63,7 @@ export default function MessagesEleve() {
       await rafraichir()
       if (annule) return
       setUserId(user.id)
-      setPeutEcrire(!!achats && achats.length > 0)
+      setAAchete(!!achats && achats.length > 0)
       setPret(true)
     }
     init()
@@ -183,7 +185,7 @@ export default function MessagesEleve() {
               </button>
             </form>
           ) : (
-            <p className="mt-4 rounded-2xl bg-mist p-4">Tu ne peux plus écrire : aucun cours acheté sur ton compte.</p>
+            <p className="mt-4 rounded-2xl bg-mist p-4">Tu ne peux pas écrire pour l’instant.</p>
           )}
         </>
       )}

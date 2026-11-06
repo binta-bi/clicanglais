@@ -12,6 +12,7 @@ export default function Inscription() {
   const [fullName, setFullName] = useState('')
   const [indicatif, setIndicatif] = useState('')
   const [telephone, setTelephone] = useState('')
+  const [accepte, setAccepte] = useState(false)
   const [erreur, setErreur] = useState('')
   const [message, setMessage] = useState('')
   const [envoi, setEnvoi] = useState(false)
@@ -31,11 +32,15 @@ export default function Inscription() {
       setErreur('Numéro WhatsApp invalide. Choisis ton pays et écris ton numéro.')
       return
     }
+    if (!accepte) {
+      setErreur('Pour créer ton compte, coche la case d’acceptation des conditions d’utilisation.')
+      return
+    }
     setEnvoi(true)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, telephone: tel } },
+      options: { data: { full_name: fullName, telephone: tel, cgu_acceptees_le: new Date().toISOString() } },
     })
     setEnvoi(false)
     if (error) {
@@ -67,7 +72,7 @@ export default function Inscription() {
             required
           >
             <option value="" disabled>
-              Pays
+              Choisis ton pays
             </option>
             {PAYS.map((p) => (
               <option key={p.iso} value={p.iso}>
@@ -117,17 +122,26 @@ export default function Inscription() {
           {message}
         </p>
       )}
-      <p className="text-sm">
-        En créant un compte, tu acceptes les{' '}
-        <Link href="/cgu" className="font-bold underline">
-          conditions d’utilisation
-        </Link>{' '}
-        et la{' '}
-        <Link href="/confidentialite" className="font-bold underline">
-          politique de confidentialité
-        </Link>
-        .
-      </p>
+      <label className="flex items-start gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={accepte}
+          onChange={(e) => setAccepte(e.target.checked)}
+          required
+          className="mt-0.5 h-5 w-5 shrink-0"
+        />
+        <span>
+          J’accepte les{' '}
+          <Link href="/cgu" target="_blank" className="font-bold underline">
+            conditions d’utilisation
+          </Link>{' '}
+          et la{' '}
+          <Link href="/confidentialite" target="_blank" className="font-bold underline">
+            politique de confidentialité
+          </Link>
+          .
+        </span>
+      </label>
       <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
         {envoi ? 'Création...' : 'S’inscrire'}
       </button>

@@ -67,7 +67,7 @@ export default function Inscription() {
             required
           >
             <option value="" disabled>
-              Choisis ton pays
+              Pays
             </option>
             {PAYS.map((p) => (
               <option key={p.iso} value={p.iso}>

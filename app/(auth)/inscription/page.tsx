@@ -73,7 +73,7 @@ export default function Inscription() {
             autoComplete="tel-national"
             value={telephone}
             onChange={(e) => setTelephone(e.target.value)}
-            placeholder="07 07 07 07 07"
+            placeholder=""
             aria-label="Numéro de téléphone"
             className={`${champ} min-w-0 flex-1`}
             required

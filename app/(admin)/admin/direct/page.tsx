@@ -1,10 +1,11 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type Cours = { id: string; title: string }
 type Seance = {
   id: string
+  course_id: string
   title: string
   starts_at: string
   ends_at: string
@@ -24,6 +25,15 @@ function quand(iso: string) {
   })
 }
 
+// Date ISO -> valeur du champ datetime-local (heure locale de l'ordinateur)
+function versChamp(iso: string) {
+  const d = new Date(iso)
+  const z = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`
+}
+
+const DUREES = [60, 90, 120, 150, 180]
+
 export default function AdminDirect() {
   const [cours, setCours] = useState<Cours[]>([])
   const [seances, setSeances] = useState<Seance[]>([])
@@ -36,6 +46,8 @@ export default function AdminDirect() {
   const [message, setMessage] = useState('')
   const [envoi, setEnvoi] = useState(false)
   const [maintenant, setMaintenant] = useState(0)
+  const [enEdition, setEnEdition] = useState<string | null>(null)
+  const formulaire = useRef<HTMLFormElement>(null)
 
   const charger = useCallback(async () => {
     const { data: c } = await supabase
@@ -47,7 +59,7 @@ export default function AdminDirect() {
     setCours((c as Cours[]) || [])
     const { data } = await supabase
       .from('live_sessions')
-      .select('id, title, starts_at, ends_at, join_url, replay_url, courses(title)')
+      .select('id, course_id, title, starts_at, ends_at, join_url, replay_url, courses(title)')
       .order('starts_at', { ascending: false })
     const liste = (data as unknown as Seance[]) || []
     setSeances(liste)
@@ -73,21 +85,43 @@ export default function AdminDirect() {
       return
     }
     setEnvoi(true)
-    const { error } = await supabase.from('live_sessions').insert({
+    const valeurs = {
       course_id: courseId,
       title: titre.trim(),
       starts_at: d.toISOString(),
       ends_at: new Date(d.getTime() + duree * 60000).toISOString(),
       join_url: lien.trim() || null,
-    })
+    }
+    const { error } = enEdition
+      ? await supabase.from('live_sessions').update(valeurs).eq('id', enEdition)
+      : await supabase.from('live_sessions').insert(valeurs)
     setEnvoi(false)
     if (error) {
       setMessage(error.message)
       return
     }
+    reinitialiser()
+    charger()
+  }
+
+  function reinitialiser() {
+    setEnEdition(null)
     setDebut('')
     setLien('')
-    charger()
+    setTitre('Séance en direct')
+    setDuree(120)
+    setCourseId('')
+  }
+
+  function modifier(s: Seance) {
+    setMessage('')
+    setEnEdition(s.id)
+    setCourseId(s.course_id)
+    setTitre(s.title)
+    setDebut(versChamp(s.starts_at))
+    setDuree(Math.round((new Date(s.ends_at).getTime() - new Date(s.starts_at).getTime()) / 60000))
+    setLien(s.join_url ?? '')
+    formulaire.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   async function enregistrerReplay(s: Seance) {
@@ -104,7 +138,10 @@ export default function AdminDirect() {
     if (!window.confirm(`Supprimer « ${s.title} » ?`)) return
     const { error } = await supabase.from('live_sessions').delete().eq('id', s.id)
     if (error) setMessage(error.message)
-    else charger()
+    else {
+      if (enEdition === s.id) reinitialiser()
+      charger()
+    }
   }
 
   const champ = 'border p-2 rounded'
@@ -113,8 +150,8 @@ export default function AdminDirect() {
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-bold">Cours en direct</h1>
 
-      <form onSubmit={ajouter} className="border rounded p-4 flex flex-col gap-3 max-w-xl">
-        <h2 className="font-bold">Programmer une séance</h2>
+      <form ref={formulaire} onSubmit={ajouter} className="border rounded p-4 flex flex-col gap-3 max-w-xl">
+        <h2 className="font-bold">{enEdition ? 'Modifier la séance' : 'Programmer une séance'}</h2>
         <label className="flex flex-col gap-1 text-sm">
           Cours concerné
           <select value={courseId} onChange={(e) => setCourseId(e.target.value)} className={champ} required>
@@ -138,7 +175,7 @@ export default function AdminDirect() {
           <label className="flex flex-col gap-1 text-sm">
             Durée
             <select value={duree} onChange={(e) => setDuree(Number(e.target.value))} className={champ}>
-              {[60, 90, 120, 150, 180].map((m) => (
+              {(DUREES.includes(duree) ? DUREES : [...DUREES, duree].sort((a, b) => a - b)).map((m) => (
                 <option key={m} value={m}>
                   {Math.floor(m / 60)} h{m % 60 ? ` ${m % 60}` : ''}
                 </option>
@@ -156,8 +193,13 @@ export default function AdminDirect() {
           </p>
         )}
         <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white p-2 rounded disabled:opacity-50">
-          {envoi ? 'Ajout...' : 'Ajouter la séance'}
+          {envoi ? 'Enregistrement...' : enEdition ? 'Enregistrer les modifications' : 'Ajouter la séance'}
         </button>
+        {enEdition && (
+          <button type="button" onClick={reinitialiser} className="border p-2 rounded">
+            Annuler la modification
+          </button>
+        )}
       </form>
 
       <div className="flex flex-col gap-3">
@@ -173,9 +215,18 @@ export default function AdminDirect() {
                   <p className="first-letter:uppercase">{quand(s.starts_at)}</p>
                   {finie && !s.replay_url && <p className="text-sm text-[#e8652d]">Séance terminée : ajoute la rediffusion.</p>}
                 </div>
-                <button onClick={() => supprimer(s)} className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm">
-                  Supprimer
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => modifier(s)}
+                    aria-label={`Modifier ${s.title}`}
+                    className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded text-sm"
+                  >
+                    Modifier
+                  </button>
+                  <button onClick={() => supprimer(s)} className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm">
+                    Supprimer
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <input

@@ -98,8 +98,8 @@ export default function AdminMessages() {
     chargerListe()
   }
 
-  async function envoyerMessage(contenu: string, piece?: Piece) {
-    if (!choisi) return
+  async function envoyerMessage(contenu: string, piece?: Piece): Promise<boolean> {
+    if (!choisi) return false
     setErreur('')
     setEnvoi(true)
     const { error } = await supabase.from('messages').insert({
@@ -111,11 +111,12 @@ export default function AdminMessages() {
     setEnvoi(false)
     if (error) {
       setErreur(error.message)
-      return
+      return false
     }
     setTexte('')
     chargerFil(choisi)
     chargerListe()
+    return true
   }
 
   async function repondre(e: React.FormEvent) {
@@ -125,7 +126,7 @@ export default function AdminMessages() {
   }
 
   async function envoyerPiece(piece: Piece) {
-    await envoyerMessage(texte, piece)
+    return envoyerMessage(texte, piece)
   }
 
   const eleve = conversations.find((c) => c.student_id === choisi)

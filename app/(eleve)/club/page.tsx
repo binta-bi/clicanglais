@@ -106,7 +106,7 @@ export default function Club() {
     fin.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
 
-  async function envoyerMessage(contenu: string, piece?: Piece) {
+  async function envoyerMessage(contenu: string, piece?: Piece): Promise<boolean> {
     setErreur('')
     setEnvoi(true)
     const { error } = await supabase.rpc('club_envoyer', {
@@ -120,10 +120,11 @@ export default function Club() {
     if (error) {
       setErreur(error.message)
       if (error.message.includes('retiré')) setStatut('exclu')
-      return
+      return false
     }
     setTexte('')
     lire()
+    return true
   }
 
   async function envoyer(e: React.FormEvent) {
@@ -133,7 +134,7 @@ export default function Club() {
   }
 
   async function envoyerPiece(piece: Piece) {
-    await envoyerMessage(texte, piece)
+    return envoyerMessage(texte, piece)
   }
 
   async function supprimer(m: Message) {

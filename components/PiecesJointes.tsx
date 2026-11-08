@@ -60,6 +60,7 @@ function formatDuree(s: number) {
 }
 
 const MAX_FICHIERS = 10
+const PAUSE_ENTRE_ENVOIS = 2300 // ms
 
 export function BoutonsPieces({
   dossier,
@@ -67,7 +68,8 @@ export function BoutonsPieces({
   desactive,
 }: {
   dossier: string
-  onPiece: (p: Piece) => Promise<void>
+  // renvoie false si le message n'a pas pu être envoyé (la page affiche déjà son erreur)
+  onPiece: (p: Piece) => Promise<void | boolean>
   desactive?: boolean
 }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'enregistre'>('repos')
@@ -126,11 +128,17 @@ export function BoutonsPieces({
     setEtat('envoi')
     setErreur('')
     const echecs: string[] = []
+    let dernierEnvoi = 0
     for (let i = 0; i < fichiers.length; i++) {
       setProgres(fichiers.length > 1 ? `${i + 1} / ${fichiers.length}` : '')
       try {
         const piece = await envoyerFichierChoisi(dossier, fichiers[i])
-        await dernierOnPiece.current(piece)
+        // le club refuse deux messages à moins de 2 secondes d'écart : on attend si besoin
+        const attente = dernierEnvoi + PAUSE_ENTRE_ENVOIS - Date.now()
+        if (attente > 0) await new Promise((r) => setTimeout(r, attente))
+        const reussi = await dernierOnPiece.current(piece)
+        dernierEnvoi = Date.now()
+        if (reussi === false) echecs.push(`${fichiers[i].name} : message non envoyé`)
         // laisse la page se mettre à jour (le texte envoyé est vidé) avant le fichier suivant
         await new Promise((r) => setTimeout(r, 50))
       } catch (err) {

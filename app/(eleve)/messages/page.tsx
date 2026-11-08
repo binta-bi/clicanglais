@@ -78,8 +78,8 @@ export default function MessagesEleve() {
     fin.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
 
-  async function envoyerMessage(contenu: string, piece?: Piece) {
-    if (!userId) return
+  async function envoyerMessage(contenu: string, piece?: Piece): Promise<boolean> {
+    if (!userId) return false
     setErreur('')
     setEnvoi(true)
     const { error } = await supabase.from('messages').insert({
@@ -95,10 +95,11 @@ export default function MessagesEleve() {
           ? error.message
           : 'Ton message n’a pas pu être envoyé. Réessaie dans un instant.'
       )
-      return
+      return false
     }
     setTexte('')
     rafraichir()
+    return true
   }
 
   async function envoyer(e: React.FormEvent) {
@@ -108,7 +109,7 @@ export default function MessagesEleve() {
   }
 
   async function envoyerPiece(piece: Piece) {
-    await envoyerMessage(texte, piece)
+    return envoyerMessage(texte, piece)
   }
 
   if (!pret) {

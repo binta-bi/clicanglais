@@ -59,6 +59,8 @@ function formatDuree(s: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
+const MAX_FICHIERS = 10
+
 export function BoutonsPieces({
   dossier,
   onPiece,
@@ -71,6 +73,7 @@ export function BoutonsPieces({
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'enregistre'>('repos')
   const [secondes, setSecondes] = useState(0)
   const [erreur, setErreur] = useState('')
+  const [progres, setProgres] = useState('')
   const entree = useRef<HTMLInputElement>(null)
   const recorder = useRef<MediaRecorder | null>(null)
   const flux = useRef<MediaStream | null>(null)
@@ -110,11 +113,33 @@ export function BoutonsPieces({
     }
   }
 
+  // Plusieurs fichiers à la fois : chacun part dans son propre message, l'un après l'autre.
+  // Le texte déjà écrit accompagne le premier ; les autres partent sans texte.
   async function choisi(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]
+    const fichiers = Array.from(e.target.files || [])
     e.target.value = ''
-    if (!f) return
-    await livrer(() => envoyerFichierChoisi(dossier, f))
+    if (fichiers.length === 0) return
+    if (fichiers.length > MAX_FICHIERS) {
+      setErreur(`${MAX_FICHIERS} fichiers maximum à la fois.`)
+      return
+    }
+    setEtat('envoi')
+    setErreur('')
+    const echecs: string[] = []
+    for (let i = 0; i < fichiers.length; i++) {
+      setProgres(fichiers.length > 1 ? `${i + 1} / ${fichiers.length}` : '')
+      try {
+        const piece = await envoyerFichierChoisi(dossier, fichiers[i])
+        await dernierOnPiece.current(piece)
+        // laisse la page se mettre à jour (le texte envoyé est vidé) avant le fichier suivant
+        await new Promise((r) => setTimeout(r, 50))
+      } catch (err) {
+        echecs.push(`${fichiers[i].name} : ${err instanceof Error ? err.message : 'envoi impossible'}`)
+      }
+    }
+    setProgres('')
+    setEtat('repos')
+    if (echecs.length > 0) setErreur(echecs.join(' — '))
   }
 
   async function demarrerVocal() {
@@ -182,16 +207,16 @@ export function BoutonsPieces({
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          <input ref={entree} type="file" accept={ACCEPT_FICHIERS} onChange={choisi} className="sr-only" tabIndex={-1} aria-hidden="true" />
+          <input ref={entree} type="file" accept={ACCEPT_FICHIERS} multiple onChange={choisi} className="sr-only" tabIndex={-1} aria-hidden="true" />
           <button type="button" disabled={occupe} onClick={() => entree.current?.click()} className="rounded-xl border px-3 py-2 text-sm disabled:opacity-50">
-            <span aria-hidden="true">📎 </span>Photo ou fichier
+            <span aria-hidden="true">📎 </span>Photos ou fichiers
           </button>
           <button type="button" disabled={occupe} onClick={demarrerVocal} className="rounded-xl border px-3 py-2 text-sm disabled:opacity-50">
             <span aria-hidden="true">🎤 </span>Message vocal
           </button>
           {etat === 'envoi' && (
             <span role="status" className="self-center text-sm text-gray-600">
-              Envoi en cours...
+              Envoi en cours{progres ? ` (${progres})` : ''}...
             </span>
           )}
         </div>

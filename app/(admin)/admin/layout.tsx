@@ -44,6 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <LienMenu href="/admin/cours">Cours</LienMenu>
         <LienMenu href="/admin/tests">Tests</LienMenu>
         <LienMenu href="/admin/evaluations">Évaluations</LienMenu>
+        <LienMenu href="/admin/resultats">Résultats</LienMenu>
         <LienMenu href="/admin/direct">Direct</LienMenu>
         <LienMenu href="/club">Club</LienMenu>
         <LienMenu href="/admin/avis">Avis</LienMenu>

@@ -139,9 +139,8 @@ export default function Club() {
 
   async function supprimer(m: Message) {
     if (!confirm('Supprimer ce message ?')) return
-    const { error } = estProf
-      ? await supabase.rpc('prof_club_supprimer', { p_id: m.id })
-      : await supabase.rpc('club_supprimer_le_mien', { p_id: m.id })
+    if (!estProf) return // seul le professeur supprime des messages
+    const { error } = await supabase.rpc('prof_club_supprimer', { p_id: m.id })
     if (error) setErreur(error.message)
     lire()
   }
@@ -251,7 +250,7 @@ export default function Club() {
                 {m.contenu && <p className="whitespace-pre-wrap">{m.contenu}</p>}
               </div>
               <div className="mt-1 flex gap-3 text-xs">
-                {(mien || estProf) && (
+                {estProf && (
                   <button type="button" onClick={() => supprimer(m)} className="text-red-700 underline">
                     Supprimer
                   </button>

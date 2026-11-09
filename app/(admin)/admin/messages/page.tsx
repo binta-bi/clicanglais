@@ -119,6 +119,19 @@ export default function AdminMessages() {
     return true
   }
 
+  async function supprimerMessage(m: Message) {
+    if (!choisi) return
+    if (!window.confirm('Supprimer ce message ? Il disparaîtra aussi chez l’élève.')) return
+    setErreur('')
+    const { error } = await supabase.rpc('prof_message_supprimer', { p_id: m.id })
+    if (error) {
+      setErreur(error.message)
+      return
+    }
+    chargerFil(choisi)
+    chargerListe()
+  }
+
   async function repondre(e: React.FormEvent) {
     e.preventDefault()
     if (!texte.trim()) return
@@ -243,7 +256,12 @@ export default function AdminMessages() {
                     )}
                     {m.content && <p className="whitespace-pre-line">{m.content}</p>}
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">{heure(m.created_at)}</p>
+                  <p className="mt-1 flex items-center gap-3 text-xs text-gray-500">
+                    {heure(m.created_at)}
+                    <button type="button" onClick={() => supprimerMessage(m)} className="text-red-700 underline">
+                      Supprimer<span className="sr-only"> ce message</span>
+                    </button>
+                  </p>
                 </div>
               ))}
               <div ref={fin} />

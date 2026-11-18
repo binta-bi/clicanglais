@@ -1,30 +1,39 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IllustrationApprenante } from '@/components/Illustrations'
 
-// Affiche la photo /apprenant.jpg (à déposer dans le dossier public) si elle existe,
-// sinon une illustration de secours aux couleurs du site.
+// Affiche la photo /apprenant.jpg (dossier public). Si elle est absente, une illustration de secours prend la place.
 export default function HeroPhoto() {
-  const [photo, setPhoto] = useState(false)
+  const [etat, setEtat] = useState<'attente' | 'ok' | 'absente'>('attente')
+  const img = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
-    const img = new window.Image()
-    img.onload = () => setPhoto(true)
-    img.src = '/apprenant.jpg'
+    // la photo peut déjà être chargée avant que React ne prenne la main
+    const el = img.current
+    if (el?.complete) setEtat(el.naturalWidth > 0 ? 'ok' : 'absente')
   }, [])
 
+  if (etat === 'absente') {
+    return (
+      <div className="absolute inset-0">
+        <IllustrationApprenante />
+      </div>
+    )
+  }
   return (
-    <div className="absolute inset-0">
-      <IllustrationApprenante />
-      {photo && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src="/apprenant.jpg"
-          alt="Une apprenante suit un cours d’anglais sur son ordinateur"
-          className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700"
-          onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-100')}
-        />
-      )}
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={img}
+      src="/apprenant.jpg"
+      width={800}
+      height={1000}
+      alt="Une apprenante suit un cours d’anglais en ligne sur son ordinateur"
+      fetchPriority="high"
+      onLoad={() => setEtat('ok')}
+      onError={() => setEtat('absente')}
+      className={`hero-zoom absolute inset-0 h-full w-full object-cover object-[50%_32%] transition-opacity duration-700 ${
+        etat === 'ok' ? 'opacity-100' : 'opacity-0'
+      }`}
+    />
   )
 }

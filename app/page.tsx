@@ -1,8 +1,12 @@
 import Link from 'next/link'
 import LessonDemo from '@/components/LessonDemo'
 import HeroPhoto from '@/components/HeroPhoto'
+import CompteurAnime from '@/components/CompteurAnime'
 import { IllustrationAvance, IllustrationDebutant, IllustrationIntermediaire } from '@/components/Illustrations'
 import { niveaux, PRIX_MOIS, PRIX_NIVEAU, fcfa, type Niveau } from '@/lib/niveaux'
+
+// Délai d'apparition d'un bloc du héros (animation échelonnée)
+const retard = (d: string) => ({ '--d': d }) as React.CSSProperties
 
 const etapes = [
   {
@@ -157,57 +161,93 @@ export default function Accueil() {
   return (
     <>
       {/* Héros */}
-      <section className="fond-hero relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-24 md:pt-16">
+      <section className="hero-ivoire relative overflow-hidden">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-6 md:grid-cols-[1.08fr_0.92fr] md:gap-14 md:pb-28 md:pt-16 lg:gap-20">
           <div>
-            <p className="etiquette monte">
-              <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
+            <p className="h-monte hero-pastille">
+              <span className="size-2 rounded-full bg-cuivre" aria-hidden="true" />
               Cours d’anglais en direct, avec replays
             </p>
-            <h1 className="monte mt-5 text-balance text-[2rem] font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-              Apprends l’anglais en direct, revois chaque cours{' '}
-              <span className="text-brand-deep">quand tu veux</span>
+            <h1
+              className="h-monte mt-6 text-balance text-[2.1rem] font-extrabold leading-[1.07] tracking-[-0.025em] text-nuit sm:text-5xl lg:text-[3.8rem]"
+              style={retard('0.1s')}
+            >
+              Apprends l’anglais en direct, revois chaque cours <span className="hero-souligne">quand tu veux</span>
             </h1>
-            <p className="monte monte-2 mt-5 max-w-xl text-base leading-relaxed text-ink/80 sm:text-lg">
+            <p
+              className="h-monte mt-6 max-w-xl text-base leading-[1.7] text-ardoise-texte sm:text-lg"
+              style={retard('0.2s')}
+            >
               Un professeur, trois niveaux, deux séances par semaine de 20h à 21h30. Chaque séance est
               enregistrée sur la plateforme, avec une transcription sur laquelle tu peux cliquer.
             </p>
-            <div className="monte monte-2 mt-7 grid gap-3 sm:max-w-lg sm:grid-cols-2">
-              <Link href="/inscription" className="btn-primary w-full">
+            <div className="h-monte mt-8 grid gap-3 sm:grid-cols-[auto_auto] sm:justify-start" style={retard('0.3s')}>
+              <Link href="/inscription" className="btn-hero">
                 Passer le test de niveau
+                <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 10h12m-5-5 5 5-5 5" />
+                </svg>
               </Link>
-              <Link href="#niveaux" className="btn-secondary w-full">
-                Voir les niveaux
+              <Link href="#niveaux" className="btn-hero-sec">
+                Découvrir les formations
               </Link>
             </div>
-            <ul className="monte monte-2 mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/75">
+            <p className="h-monte mt-5 flex max-w-md items-start gap-2.5 text-sm leading-relaxed text-ardoise-texte" style={retard('0.4s')}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" className="mt-0.5 size-[1.1rem] shrink-0 text-royal" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 2.5 3.5 5v4.7c0 3.9 2.7 6.9 6.5 7.8 3.8-.9 6.5-3.9 6.5-7.8V5L10 2.5Z" />
+                <path d="m7.2 10 2 2 3.6-4" />
+              </svg>
+              Pas sûr de ton niveau ? Le niveau Débutant est ouvert à tous, sans test : tu peux commencer dès aujourd’hui.
+            </p>
+            <ul
+              className="h-monte mt-6 hidden flex-wrap md:flex gap-x-6 gap-y-2 border-t border-nuit/10 pt-5 text-sm font-semibold text-nuit"
+              style={retard('0.5s')}
+            >
               {['Test de niveau gratuit', 'Paiement par Wave', 'Replay de chaque séance'].map((t) => (
                 <li key={t} className="flex items-center gap-2">
-                  <Coche className="!mt-0 size-4 text-brand-deep" />
+                  <Coche className="!mt-0 size-4 text-cuivre" />
                   {t}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="monte monte-2 relative mx-auto w-full max-w-md md:max-w-none">
-            <div className="relative aspect-[4/4.6] overflow-hidden rounded-[2rem] bg-mist shadow-[0_30px_60px_-28px_rgb(27_35_71/0.55)] ring-1 ring-line md:aspect-[4/5]">
+          <div className="h-monte relative mx-auto w-full max-w-md md:max-w-none" style={retard('0.25s')}>
+            <div className="hero-cadre" aria-hidden="true" />
+            <svg aria-hidden="true" className="hero-points absolute -left-6 -top-6 size-24 text-cuivre" fill="currentColor">
+              <defs>
+                <pattern id="pts" width="12" height="12" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.6" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#pts)" />
+            </svg>
+            <div className="relative aspect-[5/6] overflow-hidden rounded-[2rem] bg-royal/10 shadow-[0_40px_70px_-34px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10 md:aspect-[4/5]">
               <HeroPhoto />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-nuit/45 to-transparent" />
             </div>
-            <p className="flotte absolute -left-2 bottom-8 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 text-sm font-bold shadow-[0_16px_32px_-16px_rgb(27_35_71/0.5)] ring-1 ring-line sm:-left-6">
+            <p className="flotte absolute -left-2 bottom-8 flex items-center gap-2.5 rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-nuit shadow-[0_18px_34px_-18px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10 backdrop-blur sm:-left-6">
               <span className="relative flex size-3" aria-hidden="true">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-60" />
-                <span className="relative inline-flex size-3 rounded-full bg-brand" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-cuivre opacity-60" />
+                <span className="relative inline-flex size-3 rounded-full bg-cuivre" />
               </span>
               En direct · 20h–21h30
             </p>
-            <p className="flotte flotte-2 absolute -right-2 top-8 flex items-center gap-2 rounded-2xl bg-navy px-4 py-3 text-sm font-bold text-white shadow-[0_16px_32px_-16px_rgb(27_35_71/0.6)] sm:-right-5">
-              <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <p className="flotte flotte-2 absolute -right-2 top-8 flex items-center gap-2 rounded-2xl bg-nuit px-4 py-3 text-sm font-bold text-white shadow-[0_18px_34px_-18px_rgb(20_36_58/0.7)] sm:-right-5">
+              <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4 text-cuivre" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m5 10.5 3.5 3.5L15 6.5" />
               </svg>
               Replay disponible
             </p>
           </div>
+          <ul className="h-monte flex flex-wrap gap-x-5 gap-y-2 px-1 text-sm font-semibold text-nuit md:hidden" style={retard('0.5s')}>
+            {['Test de niveau gratuit', 'Paiement par Wave', 'Replay de chaque séance'].map((t) => (
+              <li key={t} className="flex items-center gap-2">
+                <Coche className="!mt-0 size-4 text-cuivre" />
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -217,7 +257,9 @@ export default function Accueil() {
           {chiffres.map((c) => (
             <div key={c.label} className="bg-white px-4 py-5 text-center">
               <dt className="sr-only">{c.label}</dt>
-              <dd className="text-2xl font-extrabold tracking-tight text-navy sm:text-3xl">{c.valeur}</dd>
+              <dd className="text-2xl font-extrabold tracking-tight text-navy sm:text-3xl">
+                {/^\d+$/.test(c.valeur) ? <CompteurAnime valeur={Number(c.valeur)} /> : c.valeur}
+              </dd>
               <dd className="mt-1 text-sm text-ink/70">{c.label}</dd>
             </div>
           ))}

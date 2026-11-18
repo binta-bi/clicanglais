@@ -10,6 +10,14 @@ export default function Header() {
   const [connecte, setConnecte] = useState(false)
   const [estProf, setEstProf] = useState(false)
   const [ouvert, setOuvert] = useState(false)
+  const [defile, setDefile] = useState(false)
+
+  useEffect(() => {
+    const f = () => setDefile(window.scrollY > 8)
+    f()
+    window.addEventListener('scroll', f, { passive: true })
+    return () => window.removeEventListener('scroll', f)
+  }, [])
 
   useEffect(() => {
     if (!ouvert) return
@@ -45,9 +53,15 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
+        defile || ouvert
+          ? 'border-nuit/10 bg-white/90 shadow-[0_12px_30px_-22px_rgb(20_36_58/0.55)]'
+          : 'border-transparent bg-ivoire/75'
+      }`}
+    >
       <SuiviVisites />
-      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 px-5 py-2.5">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 px-5 py-3">
         <Link href="/" className="flex items-center gap-2.5" aria-label="ClicAnglais, accueil">
           <span
             aria-hidden="true"
@@ -68,7 +82,7 @@ export default function Header() {
           onClick={() => setOuvert((o) => !o)}
           aria-expanded={ouvert}
           aria-controls="menu-principal"
-          className="grid size-11 place-items-center rounded-xl border border-line text-navy md:hidden"
+          className="grid size-11 place-items-center rounded-full border border-nuit/15 bg-white text-nuit shadow-sm transition-colors hover:border-royal/40 md:hidden"
         >
           <span className="sr-only">{ouvert ? 'Fermer le menu' : 'Ouvrir le menu'}</span>
           <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -76,39 +90,37 @@ export default function Header() {
           </svg>
         </button>
 
-        <div
-          id="menu-principal"
-          onClick={fermerSiLien}
-          className={`entete-liens menu-liens ${
-            ouvert ? 'flex' : 'hidden'
-          } max-h-[75vh] w-full flex-col gap-1 overflow-y-auto pb-3 pt-3 md:flex md:max-h-none md:w-auto md:flex-row md:items-center md:gap-1 md:overflow-visible md:p-0`}
-        >
-          <LienMenu href="/cours" className="lien-nav">Cours</LienMenu>
-          {connecte && <LienMenu href="/mes-cours" className="lien-nav">Mes cours</LienMenu>}
-          {connecte && !estProf && <LienMenu href="/direct" className="lien-nav">Direct</LienMenu>}
-          {connecte && !estProf && <LienMenu href="/evaluations" className="lien-nav">Évaluations</LienMenu>}
-          {connecte && <LienMenu href="/club" className="lien-nav">Club</LienMenu>}
-          {connecte && !estProf && <LienMessages href="/messages" className="lien-nav" />}
-          {estProf && (
-            <LienMenu href="/admin" className="lien-nav font-bold text-brand-deep">
-              Espace professeur
-            </LienMenu>
-          )}
-          {connecte ? (
-            <button onClick={() => supabase.auth.signOut()} className="lien-nav text-left">
-              Déconnexion
-            </button>
-          ) : (
-            <>
-              <LienMenu href="/connexion" className="lien-nav">Connexion</LienMenu>
-              <Link
-                href="/inscription"
-                className="menu-bouton mt-1 rounded-xl bg-brand-deep px-5 py-3 text-center font-bold text-white shadow-[0_8px_18px_-8px_rgb(201_80_27/0.7)] md:ml-2 md:mt-0 md:rounded-full md:py-2"
-              >
-                Inscription
-              </Link>
-            </>
-          )}
+        <div id="menu-principal" data-ouvert={ouvert} onClick={fermerSiLien} className="nav-panneau">
+          <div>
+            <div className="nav-liens flex flex-col pb-4 pt-2 md:flex-row md:items-center md:gap-1 md:p-0">
+              <LienMenu href="/cours" className="nav-lien">Cours</LienMenu>
+              {connecte && <LienMenu href="/mes-cours" className="nav-lien">Mes cours</LienMenu>}
+              {connecte && !estProf && <LienMenu href="/direct" className="nav-lien">Direct</LienMenu>}
+              {connecte && !estProf && <LienMenu href="/evaluations" className="nav-lien">Évaluations</LienMenu>}
+              {connecte && <LienMenu href="/club" className="nav-lien">Club</LienMenu>}
+              {connecte && !estProf && <LienMessages href="/messages" className="nav-lien" />}
+              {estProf && (
+                <LienMenu href="/admin" className="nav-lien font-bold !text-royal">
+                  Espace professeur
+                </LienMenu>
+              )}
+              {connecte ? (
+                <button onClick={() => supabase.auth.signOut()} className="nav-lien text-left">
+                  Déconnexion
+                </button>
+              ) : (
+                <>
+                  <LienMenu href="/connexion" className="nav-lien">Connexion</LienMenu>
+                  <Link href="/inscription" className="nav-cta">
+                    Inscription
+                    <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 10h12m-5-5 5 5-5 5" />
+                    </svg>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </nav>
     </header>

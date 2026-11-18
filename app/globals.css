@@ -8,6 +8,13 @@
   --color-brand-dark: #a8420f;
   --color-mist: #eef1f8;
   --color-line: #d5dcee;
+  /* Palette premium de la bannière et du menu */
+  --color-nuit: #14243a;
+  --color-royal: #244b78;
+  --color-cuivre: #d77a43;
+  --color-ivoire: #f8f6f0;
+  --color-ardoise: #687487;
+  --color-ardoise-texte: #56627a; /* ardoise un peu plus foncée : lisible pour les paragraphes */
   --font-sans: "Bricolage Grotesque Variable", system-ui, sans-serif;
 }
 
@@ -163,4 +170,413 @@ body {
   color: var(--color-brand-deep);
   font-weight: 700;
   text-decoration: none;
+}
+
+/* ---------- Animations supplémentaires ---------- */
+
+/* Barre de progression de lecture en haut de la page */
+@supports (animation-timeline: scroll()) {
+  html::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: 60;
+    background: linear-gradient(90deg, var(--color-cuivre), var(--color-royal));
+    transform-origin: 0 50%;
+    animation: progression linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes progression {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Reflet qui traverse le bouton principal au survol */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+.btn-primary:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
+}
+
+/* Mot clé du titre : dégradé qui brille doucement */
+@keyframes brille {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.brille {
+  background-image: linear-gradient(100deg, var(--color-brand-deep) 20%, #dd5b1c 50%, var(--color-brand-deep) 80%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brille 5s ease-in-out infinite;
+}
+
+/* Boutons du héros : pulsation discrète du principal */
+@keyframes halo-bouton {
+  0%, 100% { box-shadow: 0 8px 20px -8px rgb(201 80 27 / 0.55), 0 0 0 0 rgb(232 101 45 / 0.35); }
+  50% { box-shadow: 0 8px 20px -8px rgb(201 80 27 / 0.55), 0 0 0 10px rgb(232 101 45 / 0); }
+}
+.pulse-bouton {
+  animation: halo-bouton 2.8s ease-out infinite;
+}
+
+/* Illustrations vivantes */
+.anim-bulle,
+.anim-point,
+.anim-respire,
+.anim-halo,
+.anim-clin,
+.anim-play,
+.anim-ligne,
+.anim-barre,
+.anim-trace {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes bulle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.anim-bulle { animation: bulle 4s ease-in-out infinite; }
+.anim-bulle-2 { animation-delay: -1.3s; }
+.anim-bulle-3 { animation-delay: -2.6s; }
+.anim-point { animation: bulle 3s ease-in-out infinite; }
+
+@keyframes respire {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.012); }
+}
+.anim-respire { animation: respire 4.5s ease-in-out infinite; transform-origin: 50% 100%; }
+
+@keyframes halo {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.anim-halo { animation: halo 6s ease-in-out infinite; }
+
+@keyframes clin {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+.anim-clin { animation: clin 4.5s infinite; }
+
+@keyframes play {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.8; }
+}
+.anim-play { animation: play 2.2s ease-in-out infinite; }
+
+@keyframes ligne {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.55); }
+}
+.anim-ligne { animation: ligne 3.2s ease-in-out infinite; transform-origin: left center; }
+
+@keyframes barre {
+  0%, 12% { transform: scaleY(0.15); }
+  45%, 85% { transform: scaleY(1); }
+  100% { transform: scaleY(0.15); }
+}
+.anim-barre { animation: barre 6s ease-in-out infinite; transform-origin: center bottom; }
+
+@keyframes trace {
+  0%, 12% { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  50%, 88% { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  100% { stroke-dasharray: 1; stroke-dashoffset: -1; }
+}
+.anim-trace { animation: trace 6s ease-in-out infinite; }
+
+/* Respect du réglage « réduire les animations » */
+@media (prefers-reduced-motion: reduce) {
+  .brille, .pulse-bouton, [class*='anim-'] {
+    animation: none !important;
+  }
+  .brille { color: var(--color-brand-deep); background: none; }
+  .btn-primary:hover::after { transition: none; }
+}
+
+/* =====================================================================
+   Menu du site (en-tête) et bannière d'accueil : palette nuit / royal / cuivre / ivoire
+   ===================================================================== */
+
+/* --- Menu : panneau déroulant sur téléphone, ligne sur ordinateur --- */
+.nav-panneau {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  visibility: hidden;
+  transition: grid-template-rows 0.35s ease, visibility 0s linear 0.35s;
+}
+.nav-panneau[data-ouvert='true'] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.35s ease;
+}
+.nav-panneau > div {
+  min-height: 0;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .nav-panneau {
+    display: block;
+    width: auto;
+    visibility: visible;
+  }
+  .nav-panneau > div {
+    overflow: visible;
+  }
+}
+
+.nav-lien {
+  position: relative;
+  display: block;
+  padding: 1rem 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-nuit);
+  border-bottom: 1px solid rgb(20 36 58 / 0.08);
+  transition: color 0.2s;
+}
+.nav-lien::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 2.5rem;
+  height: 2px;
+  background: var(--color-cuivre);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.nav-lien:hover {
+  color: var(--color-royal);
+}
+.nav-lien:hover::after,
+.nav-lien[aria-current='page']::after {
+  transform: scaleX(1);
+}
+.nav-lien[aria-current='page'] {
+  color: var(--color-royal);
+  font-weight: 700;
+}
+@media (min-width: 768px) {
+  .nav-lien {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+    border-bottom: 0;
+  }
+  .nav-lien::after {
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.2rem;
+    width: auto;
+  }
+}
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  border-radius: 9999px;
+  background: var(--color-nuit);
+  padding: 0.85rem 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  transition: background-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.nav-cta svg {
+  color: var(--color-cuivre);
+  transition: transform 0.25s;
+}
+.nav-cta:hover {
+  background: var(--color-royal);
+  transform: translateY(-1px);
+}
+.nav-cta:hover svg {
+  transform: translateX(3px);
+}
+@media (min-width: 768px) {
+  .nav-cta {
+    margin: 0 0 0 0.6rem;
+    box-shadow: 0 12px 24px -14px rgb(20 36 58 / 0.8);
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* --- Bannière --- */
+.hero-ivoire {
+  background:
+    radial-gradient(48rem 28rem at 88% -8%, rgb(215 122 67 / 0.2), transparent 62%),
+    radial-gradient(42rem 30rem at -8% 108%, rgb(36 75 120 / 0.12), transparent 60%),
+    var(--color-ivoire);
+}
+.hero-pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: #fff;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-royal);
+  box-shadow: 0 0 0 1px rgb(20 36 58 / 0.1);
+}
+
+/* Apparition échelonnée : le délai de chaque bloc est donné par --d */
+.h-monte {
+  animation: monte 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* « quand tu veux » : bleu royal, avec un trait cuivre qui se dessine */
+.hero-souligne {
+  color: var(--color-royal);
+  background-image: linear-gradient(var(--color-cuivre), var(--color-cuivre));
+  background-repeat: no-repeat;
+  background-position: 0 94%;
+  background-size: 0% 0.12em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation: souligne 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.9s forwards;
+}
+@keyframes souligne {
+  to {
+    background-size: 100% 0.12em;
+  }
+}
+
+/* Boutons de la bannière (les autres boutons du site ne changent pas) */
+.btn-hero,
+.btn-hero-sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  padding: 0.95rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform 0.25s, box-shadow 0.25s, background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.btn-hero {
+  background: var(--color-cuivre);
+  color: var(--color-nuit);
+  box-shadow: 0 16px 30px -16px rgb(215 122 67 / 0.95), inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+.btn-hero svg {
+  transition: transform 0.25s;
+}
+.btn-hero:hover {
+  background: #e08850;
+  transform: translateY(-2px);
+  box-shadow: 0 22px 34px -16px rgb(215 122 67 / 0.95), inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+.btn-hero:hover svg {
+  transform: translateX(4px);
+}
+.btn-hero-sec {
+  border-color: rgb(36 75 120 / 0.55);
+  background: rgb(255 255 255 / 0.6);
+  color: var(--color-royal);
+}
+.btn-hero-sec:hover {
+  background: var(--color-royal);
+  border-color: var(--color-royal);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Cadre cuivre décalé derrière la photo, et petite trame de points */
+.hero-cadre {
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  border: 1.5px solid rgb(215 122 67 / 0.75);
+  transform: translate(12px, 12px);
+  animation: cadre 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.5s both;
+}
+@keyframes cadre {
+  from {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(12px, 12px);
+  }
+}
+@media (min-width: 768px) {
+  .hero-cadre {
+    transform: translate(16px, 16px);
+  }
+  @keyframes cadre {
+    from {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate(16px, 16px);
+    }
+  }
+}
+.hero-points {
+  opacity: 0.55;
+  animation: monte 1s ease-out 0.7s both;
+}
+
+/* La photo se pose doucement */
+.hero-zoom {
+  animation: zoom-photo 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes zoom-photo {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .h-monte,
+  .hero-cadre,
+  .hero-points,
+  .hero-zoom {
+    animation: none;
+  }
+  .hero-souligne {
+    animation: none;
+    background-size: 100% 0.12em;
+  }
+  .btn-hero:hover,
+  .btn-hero-sec:hover,
+  .nav-cta:hover {
+    transform: none;
+  }
 }

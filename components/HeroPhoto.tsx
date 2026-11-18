@@ -27,7 +27,7 @@ export default function HeroPhoto() {
       src="/apprenant.jpg"
       width={800}
       height={1000}
-      alt="Une apprenante suit un cours d’anglais en ligne sur son ordinateur"
+      alt="Le professeur anime un cours d’anglais devant ses élèves"
       fetchPriority="high"
       onLoad={() => setEtat('ok')}
       onError={() => setEtat('absente')}

@@ -202,11 +202,11 @@ export default function Accueil() {
               </defs>
               <rect width="100%" height="100%" fill="url(#pts)" />
             </svg>
-            <div className="relative aspect-[5/6] overflow-hidden rounded-[2rem] bg-royal/10 shadow-[0_40px_70px_-34px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10 md:aspect-[4/5]">
+            <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem] bg-royal/10 shadow-[0_40px_70px_-34px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10">
               <HeroPhoto />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-nuit/45 to-transparent" />
             </div>
-            <p className="flotte absolute -left-2 bottom-8 flex items-center gap-2.5 rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-nuit shadow-[0_18px_34px_-18px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10 backdrop-blur sm:-left-6">
+            <p className="flotte absolute -bottom-4 -left-2 flex items-center gap-2.5 rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-nuit shadow-[0_18px_34px_-18px_rgb(20_36_58/0.6)] ring-1 ring-nuit/10 backdrop-blur sm:-left-6">
               <span className="relative flex size-3" aria-hidden="true">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-cuivre opacity-60" />
                 <span className="relative inline-flex size-3 rounded-full bg-cuivre" />

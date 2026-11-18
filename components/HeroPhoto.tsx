@@ -25,13 +25,13 @@ export default function HeroPhoto() {
     <img
       ref={img}
       src="/apprenant.jpg"
-      width={800}
-      height={1000}
+      width={1000}
+      height={800}
       alt="Le professeur anime un cours d’anglais devant ses élèves"
       fetchPriority="high"
       onLoad={() => setEtat('ok')}
       onError={() => setEtat('absente')}
-      className={`hero-zoom absolute inset-0 h-full w-full object-cover object-[50%_32%] transition-opacity duration-700 ${
+      className={`hero-zoom absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
         etat === 'ok' ? 'opacity-100' : 'opacity-0'
       }`}
     />

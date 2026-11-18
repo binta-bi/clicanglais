@@ -580,3 +580,30 @@ body {
     transform: none;
   }
 }
+
+/* Listes déroulantes sous les cartes des niveaux */
+.liste-niveau {
+  border-radius: 1rem;
+  background: var(--color-ivoire);
+  padding: 0 1.1rem;
+  box-shadow: 0 0 0 1px rgb(20 36 58 / 0.1);
+  transition: background-color 0.2s;
+}
+.liste-niveau[open] {
+  background: #fff;
+  padding-bottom: 1.1rem;
+}
+.liste-niveau > summary {
+  display: flex;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 0;
+  font-weight: 700;
+  color: var(--color-nuit);
+}
+.liste-niveau > summary::-webkit-details-marker {
+  display: none;
+}

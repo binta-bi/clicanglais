@@ -2,10 +2,17 @@ import Link from 'next/link'
 import LessonDemo from '@/components/LessonDemo'
 import HeroPhoto from '@/components/HeroPhoto'
 import CompteurAnime from '@/components/CompteurAnime'
-import { IllustrationAvance, IllustrationDebutant, IllustrationIntermediaire } from '@/components/Illustrations'
 import { niveaux, PRIX_MOIS, PRIX_NIVEAU, fcfa, type Niveau } from '@/lib/niveaux'
 
 // Délai d'apparition d'un bloc du héros (animation échelonnée)
+function Chevron() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" className="size-5 shrink-0 text-royal transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m5 8 5 5 5-5" />
+    </svg>
+  )
+}
+
 const retard = (d: string) => ({ '--d': d }) as React.CSSProperties
 
 const etapes = [
@@ -27,33 +34,6 @@ const etapes = [
     texte: 'L’enregistrement reste sur la plateforme, avec sa transcription cliquable.',
   },
 ]
-
-const themes: Record<
-  Niveau['slug'],
-  { band: string; sous: string; puce: string; coche: string; trait: string }
-> = {
-  debutant: {
-    band: 'bg-mist text-ink',
-    sous: 'text-ink/80',
-    puce: 'bg-white',
-    coche: 'text-brand-deep',
-    trait: 'border-ink/20',
-  },
-  intermediaire: {
-    band: 'bg-navy text-white',
-    sous: 'text-white/85',
-    puce: 'bg-white/10',
-    coche: 'text-brand',
-    trait: 'border-white/30',
-  },
-  avance: {
-    band: 'bg-ink text-white',
-    sous: 'text-white/85',
-    puce: 'bg-white/10',
-    coche: 'text-brand',
-    trait: 'border-white/30',
-  },
-}
 
 const lignesTests = [
   { label: 'Pour entrer en', t1: 'Intermédiaire', t2: 'Avancé' },
@@ -104,10 +84,10 @@ const atouts = [
   },
 ]
 
-const formations: Record<Niveau['slug'], { accroche: string; Illustration: () => React.JSX.Element }> = {
-  debutant: { accroche: 'Les bases pour te débrouiller en anglais au quotidien.', Illustration: IllustrationDebutant },
-  intermediaire: { accroche: 'Maîtrise la grammaire et exprime-toi avec précision.', Illustration: IllustrationIntermediaire },
-  avance: { accroche: 'Fais de l’anglais un véritable outil professionnel.', Illustration: IllustrationAvance },
+const accroches: Record<Niveau['slug'], string> = {
+  debutant: 'Les bases pour te débrouiller en anglais au quotidien.',
+  intermediaire: 'Maîtrise la grammaire et exprime-toi avec précision.',
+  avance: 'Fais de l’anglais un véritable outil professionnel.',
 }
 
 const chiffres = [
@@ -266,51 +246,87 @@ export default function Accueil() {
         </dl>
       </section>
 
-      {/* Formations */}
-      <section aria-labelledby="titre-formations" className="bg-white pb-16 pt-20 md:pb-24 md:pt-28">
+      {/* Formations : les trois niveaux, avec compétences et programme dans des listes déroulantes */}
+      <section id="niveaux" aria-labelledby="titre-formations" className="scroll-mt-20 bg-white pb-16 pt-20 md:pb-24 md:pt-28">
         <div className="mx-auto max-w-6xl px-5">
           <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Nos formations</p>
           <h2 id="titre-formations" className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
             Trois niveaux pour aller de zéro à l’anglais professionnel
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/75">
-            Chaque formation dure trois mois. Tu avances à ton rythme, avec un examen final et une attestation à la fin
-            de chaque niveau.
+            Chaque niveau dure trois mois, avec environ 24 leçons d’1h30, un examen final et une attestation. Tu paies{' '}
+            {fcfa(PRIX_MOIS)} par mois, ou {fcfa(PRIX_NIVEAU)} pour les trois mois d’un niveau.
           </p>
-          <ul className="mt-10 grid gap-6 md:grid-cols-3">
-            {niveaux.map((n) => {
-              const f = formations[n.slug]
-              return (
-                <li key={n.slug} className="reveal">
-                  <Link
-                    href={`#${n.slug}`}
-                    className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_44px_-22px_rgb(27_35_71/0.45)]"
-                  >
-                    <div className="aspect-[16/10] overflow-hidden">
-                      <div className="h-full w-full transition-transform duration-500 group-hover:scale-105">
-                        <f.Illustration />
-                      </div>
-                    </div>
-                    <div className="flex flex-1 flex-col p-6">
-                      <p className="text-sm font-bold uppercase tracking-wider text-brand-deep">{n.badge}</p>
-                      <h3 className="mt-1 text-2xl font-extrabold tracking-tight">{n.nom}</h3>
-                      <p className="mt-2 leading-relaxed text-ink/75">{f.accroche}</p>
-                      <ul className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
-                        <li className="rounded-full bg-mist px-3 py-1">3 mois</li>
-                        <li className="rounded-full bg-mist px-3 py-1">{n.programme.length} leçons</li>
-                        <li className="rounded-full bg-mist px-3 py-1">{fcfa(PRIX_MOIS)} / mois</li>
-                      </ul>
-                      <span className="mt-6 inline-flex items-center gap-2 pt-2 font-bold text-navy">
-                        Découvrir le niveau
-                        <svg viewBox="0 0 20 20" aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M4 10h12m-5-5 5 5-5 5" />
-                        </svg>
+
+          <ul className="mt-10 grid grid-cols-1 items-start gap-8 md:grid-cols-3 md:gap-6">
+            {niveaux.map((n) => (
+              <li key={n.slug} id={n.slug} className="reveal scroll-mt-24">
+                <article className="group relative isolate flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-royal to-nuit p-6 text-white shadow-[0_30px_50px_-30px_rgb(20_36_58/0.7)]">
+                  {/* photo de fond (si le fichier est absent, le dégradé bleu reste) */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 -z-20 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                    style={{ backgroundImage: `url(/niveau-${n.slug}.jpg)` }}
+                  />
+                  <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-nuit via-nuit/65 to-nuit/10" />
+
+                  <p className="w-fit rounded-full border border-white/35 bg-white/15 px-3 py-1 text-sm font-bold backdrop-blur">
+                    {n.badge}
+                  </p>
+
+                  <div>
+                    <h3 className="text-3xl font-extrabold tracking-tight">{n.nom}</h3>
+                    <p className="mt-2 leading-snug text-white/90">{accroches[n.slug]}</p>
+                    <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/85">
+                      <span>
+                        <strong className="text-base text-white">{fcfa(PRIX_MOIS)}</strong> / mois
                       </span>
-                    </div>
-                  </Link>
-                </li>
-              )
-            })}
+                      <span>
+                        <strong className="text-base text-white">{fcfa(PRIX_NIVEAU)}</strong> le niveau
+                      </span>
+                    </p>
+                    <Link href="/inscription" className="btn-hero mt-5 min-h-[3.5rem] w-full !whitespace-normal !px-4 !py-3 text-center !text-[0.95rem]">
+                      {n.cta}
+                    </Link>
+                  </div>
+                </article>
+
+                <div className="mt-3 flex flex-col gap-2">
+                  <details className="liste-niveau group">
+                    <summary>
+                      <span>
+                        Compétences acquises <span className="text-ardoise-texte">({n.avantages.length})</span>
+                      </span>
+                      <Chevron />
+                    </summary>
+                    <p className="mt-3 text-sm leading-relaxed text-ardoise-texte">{n.objectif}</p>
+                    <ul className="mt-3 flex flex-col gap-2.5 text-[0.95rem]">
+                      {n.avantages.map((a) => (
+                        <li key={a} className="flex gap-3 leading-snug">
+                          <Coche className="text-cuivre" />
+                          <span>{a}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                  <details className="liste-niveau group">
+                    <summary>
+                      <span>
+                        Programme <span className="text-ardoise-texte">({n.programme.length} leçons)</span>
+                      </span>
+                      <Chevron />
+                    </summary>
+                    <ol className="mt-3 list-decimal pl-6 text-[0.95rem]">
+                      {n.programme.map((lecon) => (
+                        <li key={lecon} className="py-1 pl-1">
+                          {lecon}
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
@@ -390,91 +406,6 @@ export default function Accueil() {
             ))}
           </ol>
         </div>
-      </section>
-
-      {/* Niveaux */}
-      <section id="niveaux" className="scroll-mt-20 bg-white pt-16 md:pt-24">
-        <div className="mx-auto max-w-6xl px-5 pb-12">
-          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Le parcours</p>
-          <h2 className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-            Trois niveaux, trois mois chacun
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/80">
-            Chaque niveau compte environ 24 leçons d’1h30. Tu paies {fcfa(PRIX_MOIS)} par
-            mois, ou {fcfa(PRIX_NIVEAU)} pour les trois mois d’un niveau.
-          </p>
-        </div>
-
-        {niveaux.map((n) => {
-          const t = themes[n.slug]
-          return (
-            <article key={n.slug} id={n.slug} className={`relative scroll-mt-20 overflow-hidden ${t.band}`}>
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-brand/10 blur-2xl"
-              />
-              <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:py-20">
-                <div>
-                  <p className="inline-block rounded-full border border-current/25 px-3 py-1 text-sm font-semibold">
-                    {n.badge}
-                  </p>
-                  <h3 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">{n.nom}</h3>
-                  <p className={`mt-5 max-w-md text-lg leading-relaxed ${t.sous}`}>{n.objectif}</p>
-                  <div className="mt-7 flex flex-wrap gap-3">
-                    <p className={`rounded-xl px-4 py-3 ring-1 ring-current/10 ${t.puce}`}>
-                      <span className="block text-2xl font-extrabold">{fcfa(PRIX_MOIS)}</span>
-                      <span className={`text-sm ${t.sous}`}>par mois</span>
-                    </p>
-                    <p className={`rounded-xl px-4 py-3 ring-1 ring-current/10 ${t.puce}`}>
-                      <span className="block text-2xl font-extrabold">{fcfa(PRIX_NIVEAU)}</span>
-                      <span className={`text-sm ${t.sous}`}>le niveau, trois mois</span>
-                    </p>
-                  </div>
-                  <Link href="/inscription" className="btn-primary mt-7">
-                    {n.cta}
-                  </Link>
-                </div>
-
-                <div>
-                  <h4 className="text-xl font-bold">Compétences acquises à la fin du niveau</h4>
-                  <ul className="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
-                    {n.avantages.map((a) => (
-                      <li key={a} className="flex gap-3 leading-snug">
-                        <Coche className={t.coche} />
-                        <span>{a}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <details className={`group mt-8 border-t pt-5 ${t.trait}`}>
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-bold [&::-webkit-details-marker]:hidden">
-                      Voir les {n.programme.length} leçons du programme
-                      <svg
-                        viewBox="0 0 20 20"
-                        aria-hidden="true"
-                        className="size-5 shrink-0 transition-transform group-open:rotate-180"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="m5 8 5 5 5-5" />
-                      </svg>
-                    </summary>
-                    <ol className="mt-4 list-decimal gap-x-8 pl-6 sm:columns-2">
-                      {n.programme.map((lecon) => (
-                        <li key={lecon} className="break-inside-avoid py-1 pl-1">
-                          {lecon}
-                        </li>
-                      ))}
-                    </ol>
-                  </details>
-                </div>
-              </div>
-            </article>
-          )
-        })}
       </section>
 
       {/* Admission */}

@@ -607,3 +607,88 @@ body {
 .liste-niveau > summary::-webkit-details-marker {
   display: none;
 }
+
+/* ---------- Discussions (club et messages) ---------- */
+.chat-fond {
+  background-color: var(--color-mist);
+  background-image: radial-gradient(rgb(45 58 107 / 0.09) 1px, transparent 1.3px);
+  background-size: 18px 18px;
+}
+.chat-champ {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  max-height: 8rem;
+  resize: none;
+  border-radius: 1.5rem;
+  background: var(--color-mist);
+  padding: 0.65rem 1.1rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--color-ink);
+  field-sizing: content;
+  transition: box-shadow 0.15s, background-color 0.15s;
+}
+.chat-champ::placeholder {
+  color: var(--color-ardoise-texte);
+  opacity: 0.8;
+}
+.chat-champ:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--color-royal);
+}
+.icone-rond {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  color: var(--color-ardoise-texte);
+  transition: background-color 0.15s, color 0.15s;
+}
+.icone-rond:hover:not(:disabled) {
+  background: var(--color-mist);
+  color: var(--color-navy);
+}
+.icone-rond:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.bouton-envoi {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--color-brand-deep);
+  color: #fff;
+  box-shadow: 0 10px 18px -10px rgb(201 80 27 / 0.9);
+  transition: background-color 0.15s, transform 0.15s, opacity 0.15s;
+}
+.bouton-envoi:hover:not(:disabled) {
+  background: var(--color-brand-dark);
+  transform: scale(1.05);
+}
+.bouton-envoi:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+/* Petits liens d'action sous un message (Supprimer, Retirer du club) */
+.bulle-action {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  color: #b42318;
+}
+.bulle-mien .bulle-action {
+  color: #ffd5c4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bouton-envoi:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -10,6 +10,7 @@ import {
   type Piece,
   type TypePiece,
 } from '@/lib/pieces-jointes'
+import { IconeClip, IconeEnvoi, IconeFichier, IconeMicro, IconePoubelle } from '@/components/ChatUI'
 
 // ---- Affichage d'une pièce jointe dans un message ---------------------------------
 export function PieceAffichee({ path, type, nom }: { path: string; type: TypePiece; nom: string | null }) {
@@ -37,19 +38,23 @@ export function PieceAffichee({ path, type, nom }: { path: string; type: TypePie
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className="block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={nom ? `Photo : ${nom}` : 'Photo envoyée'} className="max-h-64 max-w-full rounded-xl" loading="lazy" />
+        <img src={url} alt={nom ? `Photo : ${nom}` : 'Photo envoyée'} className="max-h-72 max-w-full rounded-xl" loading="lazy" />
       </a>
     )
   if (type === 'audio')
     return (
-      <audio controls preload="metadata" src={url} className="max-w-full" aria-label="Message vocal">
+      <audio controls preload="metadata" src={url} className="h-11 w-64 max-w-full" aria-label="Message vocal">
         Ton navigateur ne peut pas lire ce message vocal.
       </audio>
     )
   return (
-    <a href={url} className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm underline" download={nom || undefined}>
-      <span aria-hidden="true">📄</span>
-      {nom || 'Télécharger le fichier'}
+    <a
+      href={url}
+      className="inline-flex items-center gap-3 rounded-xl bg-mist px-3 py-2.5 text-sm font-semibold text-ink hover:bg-line"
+      download={nom || undefined}
+    >
+      <IconeFichier />
+      <span className="[overflow-wrap:anywhere]">{nom || 'Télécharger le fichier'}</span>
     </a>
   )
 }
@@ -66,11 +71,15 @@ export function BoutonsPieces({
   dossier,
   onPiece,
   desactive,
+  champ,
+  envoyer,
 }: {
   dossier: string
   // renvoie false si le message n'a pas pu être envoyé (la page affiche déjà son erreur)
   onPiece: (p: Piece) => Promise<void | boolean>
   desactive?: boolean
+  champ: React.ReactNode // le champ de texte du message
+  envoyer: React.ReactNode // le bouton « Envoyer »
 }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'enregistre'>('repos')
   const [secondes, setSecondes] = useState(0)
@@ -201,36 +210,44 @@ export function BoutonsPieces({
   const occupe = etat !== 'repos' || desactive
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
+      {etat === 'envoi' && (
+        <p role="status" className="px-2 text-xs font-medium text-ardoise-texte">
+          Envoi en cours{progres ? ` (${progres})` : ''}...
+        </p>
+      )}
       {etat === 'enregistre' ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl bg-red-50 p-3 text-red-800" role="status">
-          <span aria-hidden="true" className="inline-block h-3 w-3 animate-pulse rounded-full bg-red-600" />
-          <span className="font-medium">Enregistrement {formatDuree(secondes)}</span>
-          <button type="button" onClick={() => terminerVocal(true)} className="rounded bg-red-700 px-3 py-1 text-white">
-            Arrêter et envoyer
+        <div className="flex items-center gap-2" role="status">
+          <button type="button" onClick={() => terminerVocal(false)} className="icone-rond !text-red-700 hover:!bg-red-50">
+            <IconePoubelle />
+            <span className="sr-only">Annuler</span>
           </button>
-          <button type="button" onClick={() => terminerVocal(false)} className="rounded border border-red-700 px-3 py-1">
-            Annuler
+          <div className="flex min-h-11 flex-1 items-center gap-3 rounded-3xl bg-red-50 px-4 text-red-800">
+            <span aria-hidden="true" className="inline-block size-3 animate-pulse rounded-full bg-red-600" />
+            <span className="font-semibold tabular-nums">Enregistrement {formatDuree(secondes)}</span>
+          </div>
+          <button type="button" onClick={() => terminerVocal(true)} className="bouton-envoi">
+            <IconeEnvoi />
+            <span className="sr-only">Arrêter et envoyer</span>
           </button>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-end gap-1.5">
           <input ref={entree} type="file" accept={ACCEPT_FICHIERS} multiple onChange={choisi} className="sr-only" tabIndex={-1} aria-hidden="true" />
-          <button type="button" disabled={occupe} onClick={() => entree.current?.click()} className="rounded-xl border px-3 py-2 text-sm disabled:opacity-50">
-            <span aria-hidden="true">📎 </span>Photos ou fichiers
+          <button type="button" disabled={occupe} onClick={() => entree.current?.click()} className="icone-rond">
+            <IconeClip />
+            <span className="sr-only">Photos ou fichiers</span>
           </button>
-          <button type="button" disabled={occupe} onClick={demarrerVocal} className="rounded-xl border px-3 py-2 text-sm disabled:opacity-50">
-            <span aria-hidden="true">🎤 </span>Message vocal
+          <div className="min-w-0 flex-1">{champ}</div>
+          <button type="button" disabled={occupe} onClick={demarrerVocal} className="icone-rond">
+            <IconeMicro />
+            <span className="sr-only">Message vocal</span>
           </button>
-          {etat === 'envoi' && (
-            <span role="status" className="self-center text-sm text-gray-600">
-              Envoi en cours{progres ? ` (${progres})` : ''}...
-            </span>
-          )}
+          {envoyer}
         </div>
       )}
       {erreur && (
-        <p role="alert" className="text-sm text-red-700">
+        <p role="alert" className="px-2 text-sm font-medium text-red-700">
           {erreur}
         </p>
       )}

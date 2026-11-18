@@ -1,9 +1,10 @@
 'use client'
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import { Bandeau, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeGroupe, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
@@ -28,10 +29,6 @@ const NIVEAUX: { code: Niveau; nom: string }[] = [
 ]
 
 const MAX = 1000
-
-function heure(iso: string) {
-  return new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
 
 export default function Club() {
   const router = useRouter()
@@ -199,104 +196,133 @@ export default function Club() {
       </div>
     )
 
+  const nomNiveau = NIVEAUX.find((n) => n.code === niveau)?.nom
+
   return (
-    <div className="max-w-2xl mx-auto mt-6 px-4 pb-10 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Le club : niveau {NIVEAUX.find((n) => n.code === niveau)?.nom}</h1>
-      {estProf && (
-        <div role="tablist" aria-label="Niveau du club" className="flex flex-wrap gap-2">
-          {NIVEAUX.map((n) => (
-            <button
-              key={n.code}
-              type="button"
-              role="tab"
-              aria-selected={n.code === niveau}
-              onClick={() => {
-                setMessages([])
-                setNiveau(n.code)
-              }}
-              className={`rounded-xl border px-4 py-2 text-sm font-medium ${n.code === niveau ? 'bg-brand-deep text-white' : ''}`}
-            >
-              {n.nom}
-            </button>
-          ))}
-        </div>
-      )}
-      <p className="text-sm text-gray-600">
-        Échange avec les autres élèves de ton niveau et le professeur. Reste poli et ne partage pas d&apos;informations
-        personnelles (numéro de téléphone, mot de passe).
-      </p>
-
-      <div
-        role="log"
-        aria-live="polite"
-        aria-label={`Messages du club ${NIVEAUX.find((n) => n.code === niveau)?.nom}`}
-        className="border rounded-2xl p-3 h-[55vh] overflow-y-auto flex flex-col gap-3"
-      >
-        {messages.length === 0 && <p className="text-gray-500 m-auto">Aucun message pour l&apos;instant. Lance la discussion !</p>}
-        {messages.map((m) => {
-          const mien = m.auteur_id === moi
-          return (
-            <div key={m.id} className={`flex flex-col max-w-[85%] ${mien ? 'self-end items-end' : 'self-start items-start'}`}>
-              <p className="text-xs text-gray-500">
-                <span className="font-bold text-gray-800">{m.auteur}</span>
-                {m.est_prof && <span className="ml-1 rounded bg-brand-deep px-1.5 py-0.5 text-white">Professeur</span>}
-                {' · '}
-                {heure(m.created_at)}
-              </p>
-              <div className={`mt-1 flex flex-col gap-2 rounded-2xl px-3 py-2 break-words ${mien ? 'bg-mist' : 'border'}`}>
-                {m.fichier_path && m.fichier_type && (
-                  <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
-                )}
-                {m.contenu && <p className="whitespace-pre-wrap">{m.contenu}</p>}
-              </div>
-              <div className="mt-1 flex gap-3 text-xs">
-                {estProf && (
-                  <button type="button" onClick={() => supprimer(m)} className="text-red-700 underline">
-                    Supprimer
-                  </button>
-                )}
-                {estProf && !mien && !m.est_prof && (
-                  <button type="button" onClick={() => exclure(m)} className="text-red-700 underline">
-                    Retirer du club
-                  </button>
-                )}
-              </div>
+    <div className="mx-auto max-w-3xl px-3 py-4 sm:px-5">
+      <CarteChat className="h-[calc(100dvh-6.5rem)] min-h-[32rem]">
+        <EnteteChat
+          avatar={
+            <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-brand-deep">
+              <IconeGroupe />
+            </span>
+          }
+          titre={`Le club : niveau ${nomNiveau}`}
+          sous="Les élèves de ton niveau et le professeur"
+        >
+          {estProf && (
+            <div role="tablist" aria-label="Niveau du club" className="mt-3 flex flex-wrap gap-2">
+              {NIVEAUX.map((n) => (
+                <button
+                  key={n.code}
+                  type="button"
+                  role="tab"
+                  aria-selected={n.code === niveau}
+                  onClick={() => {
+                    setMessages([])
+                    setNiveau(n.code)
+                  }}
+                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                    n.code === niveau ? 'bg-white text-navy' : 'bg-white/15 text-white hover:bg-white/25'
+                  }`}
+                >
+                  {n.nom}
+                </button>
+              ))}
             </div>
-          )
-        })}
-        <div ref={fin} />
-      </div>
+          )}
+        </EnteteChat>
+        <Bandeau>
+          Échange avec les autres élèves de ton niveau et le professeur. Reste poli et ne partage pas d&apos;informations
+          personnelles (numéro de téléphone, mot de passe).
+        </Bandeau>
 
-      <form onSubmit={envoyer} className="flex flex-col gap-2">
-        <label htmlFor="msg-club" className="sr-only">
-          Ton message
-        </label>
-        <textarea
-          id="msg-club"
-          value={texte}
-          onChange={(e) => setTexte(e.target.value.slice(0, MAX))}
-          rows={2}
-          placeholder="Écris ton message..."
-          className="border p-3 rounded-xl"
-        />
-        <BoutonsPieces dossier={`club/${niveau}`} onPiece={envoyerPiece} desactive={envoi} />
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-gray-500">
-            {texte.length} / {MAX}
-          </span>
-          <button type="submit" disabled={envoi || !texte.trim()} className="btn-primary disabled:opacity-50">
-            {envoi ? 'Envoi...' : 'Envoyer'}
-          </button>
+        <div
+          role="log"
+          aria-live="polite"
+          aria-label={`Messages du club ${nomNiveau}`}
+          onLoadCapture={() => fin.current?.scrollIntoView({ block: 'end' })}
+          className="chat-fond flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-4 sm:px-5"
+        >
+          {messages.length === 0 && (
+            <p className="m-auto rounded-2xl bg-white/90 px-4 py-2 text-ardoise-texte shadow-sm ring-1 ring-line">
+              Aucun message pour l&apos;instant. Lance la discussion !
+            </p>
+          )}
+          {messages.map((m, i) => {
+            const mien = m.auteur_id === moi
+            const nouveauJour = i === 0 || cleJour(messages[i - 1].created_at) !== cleJour(m.created_at)
+            return (
+              <Fragment key={m.id}>
+                {nouveauJour && <SeparateurJour iso={m.created_at} />}
+                <Bulle
+                  mien={mien}
+                  auteur={m.auteur}
+                  prof={m.est_prof}
+                  heure={heureCourte(m.created_at)}
+                  actions={
+                    estProf && (
+                      <>
+                        {!mien && !m.est_prof && (
+                          <button type="button" onClick={() => exclure(m)} className="bulle-action">
+                            Retirer du club
+                          </button>
+                        )}
+                        <button type="button" onClick={() => supprimer(m)} className="bulle-action">
+                          Supprimer
+                        </button>
+                      </>
+                    )
+                  }
+                >
+                  {m.fichier_path && m.fichier_type && (
+                    <div className="rounded-xl bg-white p-1 text-ink">
+                      <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                    </div>
+                  )}
+                  {m.contenu && <p className="whitespace-pre-wrap leading-snug">{m.contenu}</p>}
+                </Bulle>
+              </Fragment>
+            )
+          })}
+          <div ref={fin} />
         </div>
-        {erreur && (
-          <p role="alert" className="text-red-700 text-sm">
-            {erreur}
-          </p>
-        )}
-      </form>
+
+        <form onSubmit={envoyer} className="border-t border-line bg-white px-3 py-3 sm:px-4">
+          <label htmlFor="msg-club" className="sr-only">
+            Ton message
+          </label>
+          <BoutonsPieces
+            dossier={`club/${niveau}`}
+            onPiece={envoyerPiece}
+            desactive={envoi}
+            champ={
+              <textarea
+                id="msg-club"
+                value={texte}
+                onChange={(e) => setTexte(e.target.value.slice(0, MAX))}
+                rows={1}
+                placeholder="Écris ton message..."
+                className="chat-champ"
+              />
+            }
+            envoyer={<BoutonEnvoyer desactive={envoi || !texte.trim()} envoi={envoi} />}
+          />
+          {texte.length > MAX * 0.8 && (
+            <p className="mt-1 text-right text-xs text-ardoise-texte">
+              {texte.length} / {MAX}
+            </p>
+          )}
+          {erreur && (
+            <p role="alert" className="mt-1 px-2 text-sm font-medium text-red-700">
+              {erreur}
+            </p>
+          )}
+        </form>
+      </CarteChat>
 
       {estProf && exclus.length > 0 && (
-        <section className="rounded-2xl border p-4">
+        <section className="mt-4 rounded-2xl border border-line bg-white p-4">
           <h2 className="font-bold">Élèves retirés du club</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {exclus.map((x) => (
@@ -304,7 +330,7 @@ export default function Club() {
                 <span>
                   {x.nom} ({x.email}){x.motif ? ` : ${x.motif}` : ''}
                 </span>
-                <button type="button" onClick={() => reintegrer(x)} className="border px-3 py-1 rounded">
+                <button type="button" onClick={() => reintegrer(x)} className="rounded border px-3 py-1">
                   Réintégrer
                 </button>
               </li>

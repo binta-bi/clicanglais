@@ -1,9 +1,10 @@
 'use client'
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import { Avatar, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
@@ -17,15 +18,6 @@ type Message = {
 }
 
 const MAX = 1000
-
-function heure(iso: string) {
-  return new Date(iso).toLocaleString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 export default function MessagesEleve() {
   const router = useRouter()
@@ -121,74 +113,86 @@ export default function MessagesEleve() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">Messages</h1>
-      <p className="mt-2 text-ink/80">Ta conversation avec le professeur.</p>
-
+    <div className="mx-auto max-w-3xl px-3 py-4 sm:px-5">
       {!peutEcrire && messages.length === 0 ? (
-        <div className="mt-8 rounded-2xl bg-mist p-6">
-          <p className="font-medium">La messagerie est réservée aux élèves qui ont acheté un cours.</p>
-          <Link href="/cours" className="btn-primary mt-4">
-            Voir les cours
-          </Link>
+        <div className="px-2 py-6">
+          <h1 className="text-3xl font-extrabold tracking-tight">Messages</h1>
+          <p className="mt-2 text-ink/80">Ta conversation avec le professeur.</p>
+          <div className="mt-8 rounded-2xl bg-mist p-6">
+            <p className="font-medium">La messagerie est réservée aux élèves qui ont acheté un cours.</p>
+            <Link href="/cours" className="btn-primary mt-4">
+              Voir les cours
+            </Link>
+          </div>
         </div>
       ) : (
-        <>
-          <div
-            className="mt-6 flex max-h-[28rem] min-h-40 flex-col gap-3 overflow-y-auto rounded-2xl p-4 ring-1 ring-line"
-            aria-live="polite"
-          >
-            {messages.length === 0 && <p className="text-ink/70">Aucun message pour l&apos;instant. Écris au professeur ci-dessous.</p>}
-            {messages.map((m) => (
-              <div key={m.id} className={`flex flex-col ${m.sender_role === 'eleve' ? 'items-end' : 'items-start'}`}>
-                <div
-                  className={`flex max-w-[85%] flex-col gap-2 break-words rounded-2xl px-4 py-2 ${
-                    m.sender_role === 'eleve' ? 'bg-navy text-white' : 'bg-mist'
-                  }`}
-                >
-                  <span className="sr-only">{m.sender_role === 'eleve' ? 'Toi : ' : 'Professeur : '}</span>
-                  {m.fichier_path && m.fichier_type && (
-                    <div className="rounded-xl bg-white p-1 text-ink">
-                      <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
-                    </div>
-                  )}
-                  {m.content && <p className="whitespace-pre-line">{m.content}</p>}
-                </div>
-                <p className="mt-1 text-xs text-ink/60">{heure(m.created_at)}</p>
-              </div>
-            ))}
+        <CarteChat className="h-[calc(100dvh-6.5rem)] min-h-[32rem]">
+          <EnteteChat avatar={<Avatar nom="Professeur" />} titre="Messages" sous="Ta conversation avec le professeur" />
+
+          <div aria-live="polite" onLoadCapture={() => fin.current?.scrollIntoView({ block: 'end' })} className="chat-fond flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-4 sm:px-5">
+            {messages.length === 0 && (
+              <p className="m-auto rounded-2xl bg-white/90 px-4 py-2 text-ardoise-texte shadow-sm ring-1 ring-line">
+                Aucun message pour l&apos;instant. Écris au professeur ci-dessous.
+              </p>
+            )}
+            {messages.map((m, i) => {
+              const mien = m.sender_role === 'eleve'
+              const nouveauJour = i === 0 || cleJour(messages[i - 1].created_at) !== cleJour(m.created_at)
+              return (
+                <Fragment key={m.id}>
+                  {nouveauJour && <SeparateurJour iso={m.created_at} />}
+                  <Bulle mien={mien} auteur={mien ? undefined : 'Professeur'} heure={heureCourte(m.created_at)}>
+                    <span className="sr-only">{mien ? 'Toi : ' : 'Professeur : '}</span>
+                    {m.fichier_path && m.fichier_type && (
+                      <div className="rounded-xl bg-white p-1 text-ink">
+                        <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                      </div>
+                    )}
+                    {m.content && <p className="whitespace-pre-line leading-snug">{m.content}</p>}
+                  </Bulle>
+                </Fragment>
+              )
+            })}
             <div ref={fin} />
           </div>
 
           {peutEcrire ? (
-            <form onSubmit={envoyer} className="mt-4 flex flex-col gap-3">
-              <label className="flex flex-col gap-1 font-medium">
+            <form onSubmit={envoyer} className="border-t border-line bg-white px-3 py-3 sm:px-4">
+              <label htmlFor="msg-prive" className="sr-only">
                 Ton message
-                <textarea
-                  value={texte}
-                  onChange={(e) => setTexte(e.target.value)}
-                  maxLength={MAX}
-                  rows={3}
-                  className="rounded-xl border-2 border-line px-3 py-2 text-base"
-                />
               </label>
-              <p className="text-sm text-ink/70">
-                {texte.length} / {MAX}
-              </p>
+              <BoutonsPieces
+                dossier={`messages/${userId}`}
+                onPiece={envoyerPiece}
+                desactive={envoi}
+                champ={
+                  <textarea
+                    id="msg-prive"
+                    value={texte}
+                    onChange={(e) => setTexte(e.target.value)}
+                    maxLength={MAX}
+                    rows={1}
+                    placeholder="Écris ton message..."
+                    className="chat-champ"
+                  />
+                }
+                envoyer={<BoutonEnvoyer desactive={envoi || !texte.trim()} envoi={envoi} />}
+              />
+              {texte.length > MAX * 0.8 && (
+                <p className="mt-1 text-right text-xs text-ardoise-texte">
+                  {texte.length} / {MAX}
+                </p>
+              )}
               {erreur && (
-                <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
+                <p role="alert" className="mt-1 px-2 text-sm font-medium text-red-700">
                   {erreur}
                 </p>
               )}
-              <BoutonsPieces dossier={`messages/${userId}`} onPiece={envoyerPiece} desactive={envoi} />
-              <button type="submit" disabled={envoi || !texte.trim()} className="btn-primary w-fit disabled:opacity-50">
-                {envoi ? 'Envoi...' : 'Envoyer'}
-              </button>
             </form>
           ) : (
-            <p className="mt-4 rounded-2xl bg-mist p-4">Tu ne peux pas écrire pour l’instant.</p>
+            <p className="border-t border-line bg-white p-4 text-ardoise-texte">Tu ne peux pas écrire pour l’instant.</p>
           )}
-        </>
+        </CarteChat>
       )}
     </div>
   )

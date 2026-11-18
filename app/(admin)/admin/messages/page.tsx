@@ -1,7 +1,8 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import { Avatar, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeFleche, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Conversation = {
@@ -25,10 +26,6 @@ type Message = {
 type Inscrit = { id: string; nom: string; email: string; telephone: string | null; nb_achats: number }
 
 const MAX = 1000
-
-function heure(iso: string) {
-  return new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
-}
 
 export default function AdminMessages() {
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -155,6 +152,8 @@ export default function AdminMessages() {
         .slice(0, 8)
     : []
 
+  const nomAffiche = eleve?.full_name || nomChoisi || 'Élève'
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -163,13 +162,13 @@ export default function AdminMessages() {
           type="button"
           onClick={() => (nouveau ? setNouveau(false) : ouvrirNouveau())}
           aria-expanded={nouveau}
-          className="rounded bg-[#2d3a6b] px-4 py-2 text-sm text-white"
+          className="rounded-full bg-navy px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-royal"
         >
           {nouveau ? 'Fermer' : 'Nouveau message'}
         </button>
       </div>
       {nouveau && (
-        <section aria-labelledby="nv-titre" className="flex flex-col gap-2 rounded border p-4">
+        <section aria-labelledby="nv-titre" className="flex flex-col gap-2 rounded-2xl border border-line bg-white p-4">
           <h2 id="nv-titre" className="font-bold">Écrire à un inscrit</h2>
           <label className="flex flex-col gap-1 text-sm">
             Chercher par nom, email ou numéro
@@ -177,7 +176,7 @@ export default function AdminMessages() {
               type="search"
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              className="w-full max-w-md rounded border p-2"
+              className="w-full max-w-md rounded-xl border border-line p-2.5"
               autoFocus
             />
           </label>
@@ -188,11 +187,14 @@ export default function AdminMessages() {
                 <button
                   type="button"
                   onClick={() => ouvrir(i.id, i.nom)}
-                  className="w-full rounded border p-2 text-left text-sm"
+                  className="flex w-full items-center gap-3 rounded-xl border border-line p-2.5 text-left text-sm hover:bg-mist"
                 >
-                  <strong>{i.nom}</strong>
-                  <span className="block break-all text-gray-500">
-                    {i.email} · {i.nb_achats > 0 ? 'Élève' : 'Inscrit (sans accès)'}
+                  <Avatar nom={i.nom} className="size-9 text-sm" />
+                  <span className="min-w-0">
+                    <strong>{i.nom}</strong>
+                    <span className="block break-all text-gray-500">
+                      {i.email} · {i.nb_achats > 0 ? 'Élève' : 'Inscrit (sans accès)'}
+                    </span>
                   </span>
                 </button>
               </li>
@@ -207,27 +209,32 @@ export default function AdminMessages() {
       )}
       {pret && conversations.length === 0 && !choisi && <p className="text-gray-500">Aucun message pour l&apos;instant.</p>}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <ul className={`flex flex-col gap-2 ${choisi ? 'hidden md:flex' : ''}`}>
+      <div className="grid gap-4 md:grid-cols-[20rem_1fr]">
+        <ul className={`flex flex-col gap-1.5 ${choisi ? 'hidden md:flex' : ''}`}>
           {conversations.map((c) => (
             <li key={c.student_id}>
               <button
                 onClick={() => ouvrir(c.student_id, c.full_name || '')}
                 aria-current={c.student_id === choisi}
-                className={`w-full rounded border p-3 text-left ${c.student_id === choisi ? 'border-[#2d3a6b] bg-gray-50' : ''}`}
+                className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left ring-1 transition-colors ${
+                  c.student_id === choisi ? 'bg-mist ring-navy' : 'bg-white ring-line hover:bg-mist'
+                }`}
               >
-                <span className="flex items-center justify-between gap-2">
-                  <strong>{c.full_name || 'Élève'}</strong>
-                  {c.unread > 0 && (
-                    <span className="rounded-full bg-[#e8652d] px-2 text-xs font-bold text-white">
-                      {c.unread}
-                      <span className="sr-only"> non lus</span>
-                    </span>
-                  )}
-                </span>
-                <span className="mt-1 block truncate text-sm text-gray-500">
-                  {c.last_sender === 'professeur' ? 'Toi : ' : ''}
-                  {c.last_content || '📎 Pièce jointe'}
+                <Avatar nom={c.full_name || 'Élève'} />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center justify-between gap-2">
+                    <strong className="truncate">{c.full_name || 'Élève'}</strong>
+                    {c.unread > 0 && (
+                      <span className="rounded-full bg-brand-deep px-2 py-0.5 text-xs font-bold text-white">
+                        {c.unread}
+                        <span className="sr-only"> non lus</span>
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-0.5 block truncate text-sm text-ardoise-texte">
+                    {c.last_sender === 'professeur' ? 'Toi : ' : ''}
+                    {c.last_content || '📎 Pièce jointe'}
+                  </span>
                 </span>
               </button>
             </li>
@@ -235,58 +242,85 @@ export default function AdminMessages() {
         </ul>
 
         {choisi && (
-          <div className="flex flex-col gap-3 md:col-span-2">
-            <button onClick={() => setChoisi(null)} className="w-fit text-sm text-[#2d3a6b] md:hidden">
-              ← Toutes les conversations
-            </button>
-            <h2 className="text-lg font-bold">{eleve?.full_name || nomChoisi || 'Élève'}</h2>
-            <div className="flex max-h-[28rem] min-h-40 flex-col gap-3 overflow-y-auto rounded border p-4" aria-live="polite">
-              {messages.length === 0 && <p className="text-gray-500">Aucun message. Écris le premier ci-dessous.</p>}
-              {messages.map((m) => (
-                <div key={m.id} className={`flex flex-col ${m.sender_role === 'professeur' ? 'items-end' : 'items-start'}`}>
-                  <div
-                    className={`flex max-w-[85%] flex-col gap-2 break-words rounded-2xl px-4 py-2 ${
-                      m.sender_role === 'professeur' ? 'bg-[#2d3a6b] text-white' : 'bg-gray-100'
-                    }`}
-                  >
-                    {m.fichier_path && m.fichier_type && (
-                      <div className="rounded-xl bg-white p-1 text-black">
-                        <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
-                      </div>
-                    )}
-                    {m.content && <p className="whitespace-pre-line">{m.content}</p>}
-                  </div>
-                  <p className="mt-1 flex items-center gap-3 text-xs text-gray-500">
-                    {heure(m.created_at)}
-                    <button type="button" onClick={() => supprimerMessage(m)} className="text-red-700 underline">
-                      Supprimer<span className="sr-only"> ce message</span>
-                    </button>
-                  </p>
-                </div>
-              ))}
+          <CarteChat className="h-[75dvh] min-h-[30rem]">
+            <EnteteChat
+              h2
+              avatar={<Avatar nom={nomAffiche} />}
+              titre={nomAffiche}
+              sous="Conversation privée"
+              gauche={
+                <button
+                  type="button"
+                  onClick={() => setChoisi(null)}
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white/15 hover:bg-white/25 md:hidden"
+                >
+                  <IconeFleche />
+                  <span className="sr-only">Toutes les conversations</span>
+                </button>
+              }
+            />
+            <div aria-live="polite" onLoadCapture={() => fin.current?.scrollIntoView({ block: 'end' })} className="chat-fond flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-4 sm:px-5">
+              {messages.length === 0 && (
+                <p className="m-auto rounded-2xl bg-white/90 px-4 py-2 text-ardoise-texte shadow-sm ring-1 ring-line">
+                  Aucun message. Écris le premier ci-dessous.
+                </p>
+              )}
+              {messages.map((m, i) => {
+                const mien = m.sender_role === 'professeur'
+                const nouveauJour = i === 0 || cleJour(messages[i - 1].created_at) !== cleJour(m.created_at)
+                return (
+                  <Fragment key={m.id}>
+                    {nouveauJour && <SeparateurJour iso={m.created_at} />}
+                    <Bulle
+                      mien={mien}
+                      auteur={mien ? undefined : nomAffiche}
+                      heure={heureCourte(m.created_at)}
+                      actions={
+                        <button type="button" onClick={() => supprimerMessage(m)} className="bulle-action">
+                          Supprimer<span className="sr-only"> ce message</span>
+                        </button>
+                      }
+                    >
+                      {m.fichier_path && m.fichier_type && (
+                        <div className="rounded-xl bg-white p-1 text-ink">
+                          <PieceAffichee path={m.fichier_path} type={m.fichier_type} nom={m.fichier_nom} />
+                        </div>
+                      )}
+                      {m.content && <p className="whitespace-pre-line leading-snug">{m.content}</p>}
+                    </Bulle>
+                  </Fragment>
+                )
+              })}
               <div ref={fin} />
             </div>
-            <form onSubmit={repondre} className="flex flex-col gap-2">
-              <label className="flex flex-col gap-1 text-sm">
+            <form onSubmit={repondre} className="border-t border-line bg-white px-3 py-3 sm:px-4">
+              <label htmlFor="msg-admin" className="sr-only">
                 Ton message
-                <textarea
-                  value={texte}
-                  onChange={(e) => setTexte(e.target.value)}
-                  maxLength={MAX}
-                  rows={3}
-                  className="rounded border p-2"
-                />
               </label>
-              <BoutonsPieces dossier={`messages/${choisi}`} onPiece={envoyerPiece} desactive={envoi} />
-              <button
-                type="submit"
-                disabled={envoi || !texte.trim()}
-                className="w-fit rounded bg-[#2d3a6b] px-4 py-2 text-white disabled:opacity-50"
-              >
-                {envoi ? 'Envoi...' : 'Envoyer'}
-              </button>
+              <BoutonsPieces
+                dossier={`messages/${choisi}`}
+                onPiece={envoyerPiece}
+                desactive={envoi}
+                champ={
+                  <textarea
+                    id="msg-admin"
+                    value={texte}
+                    onChange={(e) => setTexte(e.target.value)}
+                    maxLength={MAX}
+                    rows={1}
+                    placeholder="Écris ton message..."
+                    className="chat-champ"
+                  />
+                }
+                envoyer={<BoutonEnvoyer desactive={envoi || !texte.trim()} envoi={envoi} />}
+              />
+              {texte.length > MAX * 0.8 && (
+                <p className="mt-1 text-right text-xs text-ardoise-texte">
+                  {texte.length} / {MAX}
+                </p>
+              )}
             </form>
-          </div>
+          </CarteChat>
         )}
       </div>
     </div>

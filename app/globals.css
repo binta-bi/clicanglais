@@ -37,6 +37,22 @@ body {
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-xl bg-brand-deep px-6 py-3 text-base font-bold text-white transition-colors hover:bg-brand-dark;
   }
+  .btn-primary {
+    box-shadow: 0 8px 20px -8px rgb(201 80 27 / 0.55);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+  }
+  .carte {
+    @apply rounded-2xl bg-white p-6 ring-1 ring-line transition-shadow;
+    box-shadow: 0 1px 2px rgb(27 35 71 / 0.04);
+  }
+  .carte:hover {
+    box-shadow: 0 14px 30px -14px rgb(27 35 71 / 0.25);
+  }
+  .etiquette {
+    @apply inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-semibold text-navy ring-1 ring-line;
+  }
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-xl border-2 border-ink px-6 py-3 text-base font-bold text-ink transition-colors hover:bg-ink hover:text-white;
   }
@@ -64,4 +80,87 @@ body {
   text-decoration: underline;
   text-underline-offset: 6px;
   text-decoration-thickness: 2px;
+}
+
+/* Fond du héros : dégradé doux bleu, halo orange discret */
+.fond-hero {
+  background:
+    radial-gradient(60rem 28rem at 85% -10%, rgb(232 101 45 / 0.14), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 10%, rgb(45 58 107 / 0.14), transparent 60%),
+    linear-gradient(180deg, #f4f6fc 0%, #eef1f8 100%);
+}
+
+/* Entrée en douceur des blocs du héros (désactivée si l'utilisateur réduit les animations) */
+@keyframes monte {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.monte {
+  animation: monte 0.6s ease-out both;
+}
+.monte-2 {
+  animation-delay: 0.12s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .monte {
+    animation: none;
+  }
+  .btn-primary:hover {
+    transform: none;
+  }
+}
+
+/* Apparition au défilement (si le navigateur sait le faire ; sinon le contenu est simplement visible) */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: monte linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none !important;
+  }
+}
+
+/* Petites pastilles qui flottent sur la photo du héros */
+@keyframes flotte {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.flotte {
+  animation: flotte 5s ease-in-out infinite;
+}
+.flotte-2 {
+  animation-delay: -2.5s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flotte {
+    animation: none;
+  }
+}
+
+/* Menu du haut : liens en pastilles, page en cours mise en avant */
+.lien-nav {
+  @apply rounded-xl px-3 py-3 text-base font-medium transition-colors md:rounded-full md:px-3.5 md:py-2 md:text-[0.95rem];
+}
+.lien-nav:hover {
+  background-color: var(--color-mist);
+}
+.entete-liens a[aria-current='page'] {
+  background-color: var(--color-mist);
+  color: var(--color-brand-deep);
+  font-weight: 700;
+  text-decoration: none;
 }

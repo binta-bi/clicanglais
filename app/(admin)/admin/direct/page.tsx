@@ -41,7 +41,7 @@ export default function AdminDirect() {
   const [courseId, setCourseId] = useState('')
   const [titre, setTitre] = useState('Séance en direct')
   const [debut, setDebut] = useState('')
-  const [duree, setDuree] = useState(120)
+  const [duree, setDuree] = useState(90)
   const [lien, setLien] = useState('')
   const [message, setMessage] = useState('')
   const [envoi, setEnvoi] = useState(false)
@@ -109,7 +109,7 @@ export default function AdminDirect() {
     setDebut('')
     setLien('')
     setTitre('Séance en direct')
-    setDuree(120)
+    setDuree(90)
     setCourseId('')
   }
 

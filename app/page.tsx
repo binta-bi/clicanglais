@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import LessonDemo from '@/components/LessonDemo'
+import HeroPhoto from '@/components/HeroPhoto'
+import { IllustrationAvance, IllustrationDebutant, IllustrationIntermediaire } from '@/components/Illustrations'
 import { niveaux, PRIX_MOIS, PRIX_NIVEAU, fcfa, type Niveau } from '@/lib/niveaux'
 
 const etapes = [
@@ -14,7 +16,7 @@ const etapes = [
   },
   {
     titre: 'Suis la séance en direct',
-    texte: 'Deux fois par semaine, de 19h à 21h, avec ton professeur.',
+    texte: 'Deux fois par semaine, de 20h à 21h30, avec ton professeur.',
   },
   {
     titre: 'Revois-la quand tu veux',
@@ -65,6 +67,75 @@ const regles = [
   'Les tests de niveau ne remplacent pas l’examen final de chaque niveau. Cet examen est obligatoire pour recevoir l’attestation.',
 ]
 
+const atouts = [
+  {
+    titre: 'Cours en direct',
+    texte: 'Deux séances par semaine, de 20h à 21h30, avec ton professeur. Tu poses tes questions en temps réel.',
+    icone: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>',
+  },
+  {
+    titre: 'Replays cliquables',
+    texte: 'Chaque séance est enregistrée avec sa transcription. Clique sur une phrase pour revenir à ce moment de la vidéo.',
+    icone: '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5 3.5-5 3.5z"/>',
+  },
+  {
+    titre: 'Club par niveau',
+    texte: 'Discute et pratique avec les autres élèves de ton niveau, dans un espace réservé aux inscrits.',
+    icone: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.4c1.8.8 3 2.6 3 4.6"/>',
+  },
+  {
+    titre: 'Messages avec le professeur',
+    texte: 'Écris-lui directement, avec des photos, des fichiers ou des messages vocaux.',
+    icone: '<path d="M4 5h16v11H9l-5 4z"/>',
+  },
+  {
+    titre: 'Évaluations corrigées',
+    texte: 'Des QCM chronométrés en fin de mois : tu vois ton score dès que tu envoies tes réponses.',
+    icone: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 14l2 2 4-4"/>',
+  },
+  {
+    titre: 'Attestation de fin de niveau',
+    texte: 'Après l’examen final de chaque niveau, tu reçois ton attestation.',
+    icone: '<circle cx="12" cy="9" r="5"/><path d="m8.5 13.5-1.5 7 5-3 5 3-1.5-7"/>',
+  },
+]
+
+const formations: Record<Niveau['slug'], { accroche: string; Illustration: () => React.JSX.Element }> = {
+  debutant: { accroche: 'Les bases pour te débrouiller en anglais au quotidien.', Illustration: IllustrationDebutant },
+  intermediaire: { accroche: 'Maîtrise la grammaire et exprime-toi avec précision.', Illustration: IllustrationIntermediaire },
+  avance: { accroche: 'Fais de l’anglais un véritable outil professionnel.', Illustration: IllustrationAvance },
+}
+
+const chiffres = [
+  { valeur: '3', label: 'niveaux' },
+  { valeur: '9', label: 'mois de cours' },
+  { valeur: '2', label: 'séances par semaine' },
+  { valeur: '20h–21h30', label: 'chaque séance' },
+]
+
+const questions = [
+  {
+    q: 'Comment je paie ?',
+    r: 'Le paiement se fait par Wave. Après avoir payé, tu indiques ton numéro de transaction sur le site. Ton accès est activé dès que le professeur a vérifié ton paiement, en général en quelques heures.',
+  },
+  {
+    q: 'Je dois passer le test pour commencer ?',
+    r: 'Non. Le niveau Débutant est ouvert à tous, sans test. Le test de niveau sert à entrer directement en Intermédiaire ou en Avancé.',
+  },
+  {
+    q: 'Et si je rate une séance en direct ?',
+    r: 'Chaque séance est enregistrée sur la plateforme, avec sa transcription cliquable. Tu peux la revoir quand tu veux.',
+  },
+  {
+    q: 'Puis-je être remboursé ?',
+    r: 'Un cours activé n’est pas remboursé. Un remboursement est possible en cas de double paiement ou de problème technique qui t’empêche d’accéder au cours, si tu en fais la demande dans les 7 jours.',
+  },
+  {
+    q: 'Comment recevoir mon attestation ?',
+    r: 'Chaque niveau se termine par un examen final. Cet examen est obligatoire pour recevoir l’attestation.',
+  },
+]
+
 function Coche({ className = '' }: { className?: string }) {
   return (
     <svg
@@ -86,36 +157,177 @@ export default function Accueil() {
   return (
     <>
       {/* Héros */}
-      <section className="bg-mist">
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-14 md:grid-cols-2 md:py-20">
+      <section className="fond-hero relative overflow-hidden">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-24 md:pt-16">
           <div>
-            <h1 className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              Apprends l’anglais en direct, revois chaque cours quand tu veux
+            <p className="etiquette monte">
+              <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
+              Cours d’anglais en direct, avec replays
+            </p>
+            <h1 className="monte mt-5 text-balance text-[2rem] font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+              Apprends l’anglais en direct, revois chaque cours{' '}
+              <span className="text-brand-deep">quand tu veux</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/80">
-              Un professeur, trois niveaux, deux séances par semaine de 19h à 21h. Chaque séance est
+            <p className="monte monte-2 mt-5 max-w-xl text-base leading-relaxed text-ink/80 sm:text-lg">
+              Un professeur, trois niveaux, deux séances par semaine de 20h à 21h30. Chaque séance est
               enregistrée sur la plateforme, avec une transcription sur laquelle tu peux cliquer.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/inscription" className="btn-primary">
+            <div className="monte monte-2 mt-7 grid gap-3 sm:max-w-lg sm:grid-cols-2">
+              <Link href="/inscription" className="btn-primary w-full">
                 Passer le test de niveau
               </Link>
-              <Link href="#niveaux" className="btn-secondary">
+              <Link href="#niveaux" className="btn-secondary w-full">
                 Voir les niveaux
               </Link>
             </div>
-            <p className="mt-4 text-sm text-ink/70">
-              Le test est gratuit. Tu peux aussi commencer directement au niveau Débutant.
+            <ul className="monte monte-2 mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/75">
+              {['Test de niveau gratuit', 'Paiement par Wave', 'Replay de chaque séance'].map((t) => (
+                <li key={t} className="flex items-center gap-2">
+                  <Coche className="!mt-0 size-4 text-brand-deep" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="monte monte-2 relative mx-auto w-full max-w-md md:max-w-none">
+            <div className="relative aspect-[4/4.6] overflow-hidden rounded-[2rem] bg-mist shadow-[0_30px_60px_-28px_rgb(27_35_71/0.55)] ring-1 ring-line md:aspect-[4/5]">
+              <HeroPhoto />
+            </div>
+            <p className="flotte absolute -left-2 bottom-8 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 text-sm font-bold shadow-[0_16px_32px_-16px_rgb(27_35_71/0.5)] ring-1 ring-line sm:-left-6">
+              <span className="relative flex size-3" aria-hidden="true">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-60" />
+                <span className="relative inline-flex size-3 rounded-full bg-brand" />
+              </span>
+              En direct · 20h–21h30
+            </p>
+            <p className="flotte flotte-2 absolute -right-2 top-8 flex items-center gap-2 rounded-2xl bg-navy px-4 py-3 text-sm font-bold text-white shadow-[0_16px_32px_-16px_rgb(27_35_71/0.6)] sm:-right-5">
+              <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m5 10.5 3.5 3.5L15 6.5" />
+              </svg>
+              Replay disponible
             </p>
           </div>
-          <LessonDemo />
+        </div>
+      </section>
+
+      {/* Chiffres */}
+      <section aria-label="L’essentiel en chiffres" className="relative z-10 -mt-8 px-5">
+        <dl className="mx-auto grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-2xl bg-line shadow-[0_18px_40px_-20px_rgb(27_35_71/0.35)] ring-1 ring-line md:grid-cols-4">
+          {chiffres.map((c) => (
+            <div key={c.label} className="bg-white px-4 py-5 text-center">
+              <dt className="sr-only">{c.label}</dt>
+              <dd className="text-2xl font-extrabold tracking-tight text-navy sm:text-3xl">{c.valeur}</dd>
+              <dd className="mt-1 text-sm text-ink/70">{c.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* Formations */}
+      <section aria-labelledby="titre-formations" className="bg-white pb-16 pt-20 md:pb-24 md:pt-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Nos formations</p>
+          <h2 id="titre-formations" className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+            Trois niveaux pour aller de zéro à l’anglais professionnel
+          </h2>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/75">
+            Chaque formation dure trois mois. Tu avances à ton rythme, avec un examen final et une attestation à la fin
+            de chaque niveau.
+          </p>
+          <ul className="mt-10 grid gap-6 md:grid-cols-3">
+            {niveaux.map((n) => {
+              const f = formations[n.slug]
+              return (
+                <li key={n.slug} className="reveal">
+                  <Link
+                    href={`#${n.slug}`}
+                    className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_44px_-22px_rgb(27_35_71/0.45)]"
+                  >
+                    <div className="aspect-[16/10] overflow-hidden">
+                      <div className="h-full w-full transition-transform duration-500 group-hover:scale-105">
+                        <f.Illustration />
+                      </div>
+                    </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <p className="text-sm font-bold uppercase tracking-wider text-brand-deep">{n.badge}</p>
+                      <h3 className="mt-1 text-2xl font-extrabold tracking-tight">{n.nom}</h3>
+                      <p className="mt-2 leading-relaxed text-ink/75">{f.accroche}</p>
+                      <ul className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
+                        <li className="rounded-full bg-mist px-3 py-1">3 mois</li>
+                        <li className="rounded-full bg-mist px-3 py-1">{n.programme.length} leçons</li>
+                        <li className="rounded-full bg-mist px-3 py-1">{fcfa(PRIX_MOIS)} / mois</li>
+                      </ul>
+                      <span className="mt-6 inline-flex items-center gap-2 pt-2 font-bold text-navy">
+                        Découvrir le niveau
+                        <svg viewBox="0 0 20 20" aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 10h12m-5-5 5 5-5 5" />
+                        </svg>
+                      </span>
+                    </div>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* Une leçon type */}
+      <section aria-labelledby="titre-lecon" className="bg-mist py-16 md:py-24">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2 md:gap-16">
+          <div className="reveal">
+            <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Les replays</p>
+            <h2 id="titre-lecon" className="mt-2 text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+              Revois chaque séance, phrase par phrase
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-ink/75">
+              Chaque cours est enregistré avec sa transcription. Tu cliques sur une phrase et la vidéo revient
+              exactement à ce moment : idéal pour réviser, répéter et retenir.
+            </p>
+          </div>
+          <div className="reveal">
+            <LessonDemo />
+          </div>
+        </div>
+      </section>
+
+      {/* Atouts */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-5">
+          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Pourquoi ClicAnglais</p>
+          <h2 className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+            Tout ce qu’il faut pour progresser, au même endroit
+          </h2>
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {atouts.map((a) => (
+              <li key={a.titre} className="carte reveal">
+                <span className="grid size-12 place-items-center rounded-xl bg-mist text-navy">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="size-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    dangerouslySetInnerHTML={{ __html: a.icone }}
+                  />
+                </span>
+                <h3 className="mt-4 text-xl font-bold leading-snug">{a.titre}</h3>
+                <p className="mt-2 leading-relaxed text-ink/80">{a.texte}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* Déroulement */}
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-mist py-16 md:py-24">
         <div className="mx-auto max-w-6xl px-5">
-          <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">En 4 étapes</p>
+          <h2 className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
             Comment ça se passe
           </h2>
           <ol className="relative mt-10 grid gap-8 md:grid-cols-4 md:gap-6">
@@ -125,7 +337,7 @@ export default function Accueil() {
             />
             {etapes.map((etape, i) => (
               <li key={etape.titre} className="relative flex gap-4 md:block">
-                <span className="relative grid size-11 shrink-0 place-items-center rounded-[22%] bg-navy text-lg font-extrabold text-white">
+                <span className="relative grid size-11 shrink-0 place-items-center rounded-[22%] bg-navy text-lg font-extrabold text-white shadow-[0_8px_18px_-8px_rgb(45_58_107/0.7)]">
                   {i + 1}
                 </span>
                 <div className="md:mt-5">
@@ -139,13 +351,14 @@ export default function Accueil() {
       </section>
 
       {/* Niveaux */}
-      <section id="niveaux" className="scroll-mt-4 bg-white pt-4">
-        <div className="mx-auto max-w-6xl px-5 pb-10">
-          <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+      <section id="niveaux" className="scroll-mt-20 bg-white pt-16 md:pt-24">
+        <div className="mx-auto max-w-6xl px-5 pb-12">
+          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Le parcours</p>
+          <h2 className="mt-2 max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
             Trois niveaux, trois mois chacun
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/80">
-            Chaque niveau compte environ 24 leçons de deux heures. Tu paies {fcfa(PRIX_MOIS)} par
+            Chaque niveau compte environ 24 leçons d’1h30. Tu paies {fcfa(PRIX_MOIS)} par
             mois, ou {fcfa(PRIX_NIVEAU)} pour les trois mois d’un niveau.
           </p>
         </div>
@@ -153,20 +366,24 @@ export default function Accueil() {
         {niveaux.map((n) => {
           const t = themes[n.slug]
           return (
-            <article key={n.slug} id={n.slug} className={`scroll-mt-4 ${t.band}`}>
-              <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:py-20">
+            <article key={n.slug} id={n.slug} className={`relative scroll-mt-20 overflow-hidden ${t.band}`}>
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-brand/10 blur-2xl"
+              />
+              <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:py-20">
                 <div>
-                  <p className="text-lg font-semibold">{n.badge}</p>
-                  <h3 className="mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                    {n.nom}
-                  </h3>
+                  <p className="inline-block rounded-full border border-current/25 px-3 py-1 text-sm font-semibold">
+                    {n.badge}
+                  </p>
+                  <h3 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">{n.nom}</h3>
                   <p className={`mt-5 max-w-md text-lg leading-relaxed ${t.sous}`}>{n.objectif}</p>
                   <div className="mt-7 flex flex-wrap gap-3">
-                    <p className={`rounded-xl px-4 py-3 ${t.puce}`}>
+                    <p className={`rounded-xl px-4 py-3 ring-1 ring-current/10 ${t.puce}`}>
                       <span className="block text-2xl font-extrabold">{fcfa(PRIX_MOIS)}</span>
                       <span className={`text-sm ${t.sous}`}>par mois</span>
                     </p>
-                    <p className={`rounded-xl px-4 py-3 ${t.puce}`}>
+                    <p className={`rounded-xl px-4 py-3 ring-1 ring-current/10 ${t.puce}`}>
                       <span className="block text-2xl font-extrabold">{fcfa(PRIX_NIVEAU)}</span>
                       <span className={`text-sm ${t.sous}`}>le niveau, trois mois</span>
                     </p>
@@ -222,7 +439,8 @@ export default function Accueil() {
       <section className="bg-white py-16 md:py-24">
         <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-2 lg:gap-16">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">Les tests</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
               Admission et test de niveau
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink/80">
@@ -240,10 +458,10 @@ export default function Accueil() {
           </div>
 
           <div className="self-start">
-            <div className="overflow-x-auto rounded-2xl ring-1 ring-line">
+            <div className="overflow-x-auto rounded-2xl bg-white shadow-[0_18px_40px_-24px_rgb(27_35_71/0.35)] ring-1 ring-line">
               <table className="w-full border-collapse text-left">
                 <caption className="sr-only">Comparaison des deux tests de niveau</caption>
-                <thead className="bg-mist">
+                <thead className="bg-navy text-white">
                   <tr>
                     <th scope="col" className="p-3 sm:p-4">
                       <span className="sr-only">Critère</span>
@@ -276,9 +494,50 @@ export default function Accueil() {
         </div>
       </section>
 
+      {/* Questions fréquentes */}
+      <section className="bg-mist py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-5">
+          <p className="text-sm font-bold uppercase tracking-widest text-brand-deep">FAQ</p>
+          <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Questions fréquentes</h2>
+          <div className="mt-8 flex flex-col gap-3">
+            {questions.map((q) => (
+              <details key={q.q} className="group rounded-2xl bg-white p-5 ring-1 ring-line open:shadow-[0_14px_30px_-18px_rgb(27_35_71/0.3)]">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-bold [&::-webkit-details-marker]:hidden">
+                  {q.q}
+                  <svg
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                    className="size-5 shrink-0 text-brand-deep transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m5 8 5 5 5-5" />
+                  </svg>
+                </summary>
+                <p className="mt-3 leading-relaxed text-ink/80">{q.r}</p>
+              </details>
+            ))}
+          </div>
+          <p className="mt-6 text-ink/80">
+            Une autre question ? Écris-nous à{' '}
+            <a href="mailto:clicanglais@gmail.com" className="font-bold text-navy underline">
+              clicanglais@gmail.com
+            </a>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* Appel final */}
-      <section className="bg-navy text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-14 md:flex-row md:items-center md:justify-between md:py-16">
+      <section className="relative overflow-hidden bg-navy text-white">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-20 -top-24 size-80 rounded-full bg-brand/20 blur-3xl"
+        />
+        <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-16 md:flex-row md:items-center md:justify-between md:py-20">
           <div>
             <h2 className="max-w-xl text-3xl font-extrabold tracking-tight sm:text-4xl">
               Prêt à commencer ?
@@ -294,21 +553,29 @@ export default function Accueil() {
       </section>
 
       <footer className="bg-ink text-white/80">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8">
-          <p>
-            <span className="text-xl font-extrabold text-white">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 md:grid-cols-[2fr_1fr_1fr]">
+          <div>
+            <p className="text-2xl font-extrabold text-white">
               Clic<span className="text-brand">Anglais</span>
-            </span>
-            <span className="ml-3">Apprends l’anglais en quelques clics</span>
-          </p>
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">
-            <Link href="/cours">Cours</Link>
-            <Link href="/connexion">Connexion</Link>
-            <Link href="/inscription">Inscription</Link>
-            <Link href="/cgu">Conditions</Link>
-            <Link href="/confidentialite">Confidentialité</Link>
+            </p>
+            <p className="mt-2 max-w-sm leading-relaxed">
+              Cours d’anglais en direct, replays et exercices, pour tous les niveaux.
+            </p>
+          </div>
+          <nav aria-label="Pied de page" className="flex flex-col gap-2 text-sm font-medium">
+            <Link href="/cours" className="hover:text-white">Cours</Link>
+            <Link href="/connexion" className="hover:text-white">Connexion</Link>
+            <Link href="/inscription" className="hover:text-white">Inscription</Link>
+          </nav>
+          <nav aria-label="Informations légales" className="flex flex-col gap-2 text-sm font-medium">
+            <Link href="/cgu" className="hover:text-white">Conditions d’utilisation</Link>
+            <Link href="/confidentialite" className="hover:text-white">Confidentialité</Link>
+            <a href="mailto:clicanglais@gmail.com" className="hover:text-white">clicanglais@gmail.com</a>
           </nav>
         </div>
+        <p className="border-t border-white/10 px-5 py-5 text-center text-sm text-white/60">
+          © 2026 ClicAnglais. Tous droits réservés.
+        </p>
       </footer>
     </>
   )

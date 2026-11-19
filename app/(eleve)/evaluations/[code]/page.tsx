@@ -196,11 +196,11 @@ function Evaluation() {
   if (etat === 'apercu' && apercu)
     return (
       <div className="max-w-2xl mx-auto mt-10 px-4 pb-16 flex flex-col gap-5">
-        <Link href="/evaluations" className="text-sm text-[#2d3a6b]">
+        <Link href="/evaluations" className="text-sm font-semibold text-royal">
           ← Mes évaluations
         </Link>
-        <h1 className="text-2xl font-bold">{apercu.titre}</h1>
-        <ul className="rounded-2xl bg-mist p-5 flex flex-col gap-2">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">{apercu.titre}</h1>
+        <ul className="flex flex-col gap-2 rounded-3xl bg-white p-6 ring-1 ring-nuit/10">
           <li>{apercu.nb_questions} questions à choix multiples</li>
           <li>Durée : {apercu.duree_minutes} minutes, chronomètre affiché en haut de la page</li>
           <li className="font-bold">Une seule tentative, aucun second essai</li>
@@ -211,7 +211,7 @@ function Evaluation() {
           <li>À la fin, tu vois ton score et la correction.</li>
         </ul>
         <p>Assure-toi d&apos;être au calme et d&apos;avoir une bonne connexion avant de commencer.</p>
-        <button type="button" onClick={commencer} className="btn-primary self-start">
+        <button type="button" onClick={commencer} className="btn-hero self-start">
           Commencer l&apos;évaluation
         </button>
       </div>
@@ -221,7 +221,7 @@ function Evaluation() {
     const repondues = Object.keys(reponses).length
     return (
       <div className="max-w-2xl mx-auto px-4 pb-16">
-        <div className="sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between gap-3 border-b bg-white px-4 py-3">
+        <div className="sticky top-0 z-10 -mx-4 mb-4 flex items-center justify-between gap-3 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
           <p className="text-sm">
             {repondues} / {questions.length} réponses
           </p>
@@ -236,15 +236,15 @@ function Evaluation() {
         <ol className="flex flex-col gap-6">
           {questions.map((q, i) => (
             <li key={q.id}>
-              <fieldset className="flex flex-col gap-2">
+              <fieldset className="flex flex-col gap-2 rounded-3xl bg-white p-5 ring-1 ring-nuit/10">
                 <legend className="font-medium mb-2">
                   {i + 1}. {q.question}
                 </legend>
                 {q.choices.map((c) => (
                   <label
                     key={c}
-                    className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer ${
-                      reponses[q.id] === c ? 'border-[#2d3a6b] bg-mist' : ''
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 bg-white p-3 transition-colors hover:bg-mist ${
+                      reponses[q.id] === c ? 'border-royal bg-mist' : 'border-line'
                     }`}
                   >
                     <input type="radio" name={q.id} checked={reponses[q.id] === c} onChange={() => choisir(q.id, c)} />
@@ -260,7 +260,7 @@ function Evaluation() {
             {message}
           </p>
         )}
-        <button type="button" onClick={rendre} disabled={envoi} className="btn-primary mt-8 disabled:opacity-50">
+        <button type="button" onClick={rendre} disabled={envoi} className="btn-hero mt-8 disabled:opacity-50">
           {envoi ? 'Envoi...' : 'Terminer et voir mon résultat'}
         </button>
       </div>
@@ -271,16 +271,16 @@ function Evaluation() {
     const pct = resultat.total ? Math.round((100 * resultat.score) / resultat.total) : 0
     return (
       <div className="max-w-2xl mx-auto mt-10 px-4 pb-16 flex flex-col gap-5">
-        <Link href="/evaluations" className="text-sm text-[#2d3a6b]">
+        <Link href="/evaluations" className="text-sm font-semibold text-royal">
           ← Mes évaluations
         </Link>
-        <h1 className="text-2xl font-bold">{resultat.titre}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">{resultat.titre}</h1>
         {(MESSAGE_STATUT[resultat.statut] || message) && (
           <p role="status" className="rounded-xl bg-amber-50 p-4 font-medium text-amber-900">
             {MESSAGE_STATUT[resultat.statut] || message}
           </p>
         )}
-        <div className="rounded-2xl bg-mist p-6 text-center">
+        <div className="rounded-3xl bg-white p-6 text-center ring-1 ring-nuit/10 shadow-sm">
           <p className="text-4xl font-bold">
             {resultat.score} / {resultat.total}
           </p>
@@ -289,7 +289,7 @@ function Evaluation() {
         <h2 className="text-lg font-bold">Correction</h2>
         <ol className="flex flex-col gap-4">
           {resultat.detail.map((d, i) => (
-            <li key={i} className={`rounded-2xl border-2 p-4 ${d.ok ? 'border-green-600' : 'border-red-500'}`}>
+            <li key={i} className={`rounded-2xl border-2 bg-white p-4 ${d.ok ? 'border-green-600' : 'border-red-500'}`}>
               <p className="font-medium">
                 {i + 1}. {d.question}
               </p>
@@ -315,8 +315,10 @@ function Evaluation() {
 
 export default function PageEvaluation() {
   return (
-    <Suspense fallback={<p className="text-center mt-10">Chargement...</p>}>
-      <Evaluation />
-    </Suspense>
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]">
+      <Suspense fallback={<p className="text-center mt-10">Chargement...</p>}>
+        <Evaluation />
+      </Suspense>
+    </div>
   )
 }

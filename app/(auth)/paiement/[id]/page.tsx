@@ -195,7 +195,7 @@ function Paiement() {
     return (
       <div className="mx-auto max-w-2xl px-5 py-16">
         <h1 className="text-2xl font-bold">Commande introuvable</h1>
-        <Link href="/cours" className="btn-primary mt-6">
+        <Link href="/cours" className="btn-hero mt-6">
           Voir les cours
         </Link>
       </div>
@@ -210,11 +210,11 @@ function Paiement() {
   if (commande.status === 'paye') {
     return (
       <div className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">Paiement reçu, merci !</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Paiement reçu, merci !</h1>
         <p className="mt-3 text-lg">
           Tu as maintenant accès à : <strong>{titre}</strong>.
         </p>
-        <Link href="/mes-cours" className="btn-primary mt-6">
+        <Link href="/mes-cours" className="btn-hero mt-6">
           Aller à mes cours
         </Link>
       </div>
@@ -227,7 +227,7 @@ function Paiement() {
     const refuse = commande.provider === 'manuel' && !!commande.declare_le
     return (
       <div className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">
           {refuse ? 'Ton paiement n’a pas été validé' : 'Le paiement n’a pas abouti'}
         </h1>
         {refuse ? (
@@ -245,7 +245,7 @@ function Paiement() {
         ) : (
           <p className="mt-3 text-lg">Aucun montant n&apos;a été débité. Tu peux réessayer depuis la page du cours.</p>
         )}
-        <Link href="/cours" className="btn-primary mt-6">
+        <Link href="/cours" className="btn-hero mt-6">
           Retour aux cours
         </Link>
       </div>
@@ -255,8 +255,8 @@ function Paiement() {
   if (enAttenteDeValidation) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">Paiement en attente de validation</h1>
-        <section className="mt-6 rounded-2xl bg-mist p-6">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Paiement en attente de validation</h1>
+        <section className="mt-6 rounded-3xl bg-white p-6 ring-1 ring-nuit/10 shadow-[0_20px_44px_-32px_rgb(20_36_58/0.5)]">
           <p className="text-lg font-bold">{titre}</p>
           <p className="mt-1 text-2xl font-extrabold tabular-nums">{fcfa(commande.amount)}</p>
           <p className="mt-3">
@@ -273,7 +273,7 @@ function Paiement() {
           </p>
         )}
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={actualiser} disabled={verification} className="btn-primary disabled:opacity-50">
+          <button onClick={actualiser} disabled={verification} className="btn-hero disabled:opacity-50">
             {verification ? 'Vérification...' : 'Vérifier maintenant'}
           </button>
           <Link href="/mes-cours" className="btn-secondary">
@@ -291,17 +291,17 @@ function Paiement() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight">Ta commande</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Ta commande</h1>
 
-      <section className="mt-6 rounded-2xl bg-mist p-6">
+      <section className="mt-6 rounded-3xl bg-white p-6 ring-1 ring-nuit/10 shadow-[0_20px_44px_-32px_rgb(20_36_58/0.5)]">
         <p className="text-lg font-bold">{titre}</p>
         <p className="mt-2 text-3xl font-extrabold tabular-nums">{fcfa(commande.amount)}</p>
       </section>
 
       {mode === 'manuel' ? (
         <section className="mt-6 flex flex-col gap-6" aria-label="Paiement avec Wave">
-          <div className="flex flex-col gap-3 rounded-2xl border-2 border-line p-6">
-            <h2 className="text-xl font-bold">1. Paie {fcfa(commande.amount)} avec Wave</h2>
+          <div className="flex flex-col gap-3 rounded-3xl border-l-4 border-l-cuivre bg-white p-6 ring-1 ring-nuit/10 shadow-[0_20px_44px_-32px_rgb(20_36_58/0.5)]">
+            <h2 className="text-xl font-extrabold text-nuit">1. Paie {fcfa(commande.amount)} avec Wave</h2>
             <p>
               Compte : <strong>{WAVE_NOM_COMPTE}</strong>. Vérifie bien que le montant est{' '}
               <strong>{fcfa(commande.amount)}</strong>.
@@ -310,7 +310,7 @@ function Paiement() {
               href={lienWave(commande.amount)}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary self-start"
+              className="btn-hero self-start"
             >
               Payer {fcfa(commande.amount)} avec Wave
             </a>
@@ -326,8 +326,8 @@ function Paiement() {
             />
           </div>
 
-          <form onSubmit={declarer} className="flex flex-col gap-4 rounded-2xl border-2 border-line p-6">
-            <h2 className="text-xl font-bold">2. Envoie-nous ton numéro de transaction</h2>
+          <form onSubmit={declarer} className="flex flex-col gap-4 rounded-3xl border-l-4 border-l-cuivre bg-white p-6 ring-1 ring-nuit/10 shadow-[0_20px_44px_-32px_rgb(20_36_58/0.5)]">
+            <h2 className="text-xl font-extrabold text-nuit">2. Envoie-nous ton numéro de transaction</h2>
             <p>
               Après le paiement, Wave t&apos;envoie un reçu (SMS ou historique de l&apos;application). Recopie son
               numéro de transaction ici.
@@ -340,7 +340,7 @@ function Paiement() {
                 required
                 autoComplete="off"
                 autoCapitalize="characters"
-                className="rounded-xl border-2 border-line px-4 py-3 font-mono text-base font-normal"
+                className="champ-auth font-mono"
               />
             </label>
             <label className="flex flex-col gap-1 font-medium">
@@ -351,10 +351,10 @@ function Paiement() {
                 onChange={(e) => setTel(e.target.value)}
                 required
                 autoComplete="tel"
-                className="rounded-xl border-2 border-line px-4 py-3 text-base font-normal"
+                className="champ-auth"
               />
             </label>
-            <button type="submit" disabled={envoi} className="btn-primary self-start disabled:opacity-50">
+            <button type="submit" disabled={envoi} className="btn-hero self-start disabled:opacity-50">
               {envoi ? 'Envoi...' : 'J’ai payé : envoyer pour validation'}
             </button>
           </form>
@@ -364,7 +364,7 @@ function Paiement() {
           <p className="font-bold">MODE TEST : aucun argent réel n&apos;est débité.</p>
           <p>Cette page remplace le paiement réel pendant la phase de test.</p>
           <div className="flex flex-wrap gap-3">
-            <button onClick={() => simuler(true)} disabled={envoi} className="btn-primary disabled:opacity-50">
+            <button onClick={() => simuler(true)} disabled={envoi} className="btn-hero disabled:opacity-50">
               Simuler un paiement réussi
             </button>
             <button onClick={() => simuler(false)} disabled={envoi} className="btn-secondary disabled:opacity-50">
@@ -373,7 +373,7 @@ function Paiement() {
           </div>
         </section>
       ) : (
-        <section className="mt-6 flex flex-col gap-4 rounded-2xl bg-mist p-6">
+        <section className="mt-6 flex flex-col gap-4 rounded-3xl bg-white p-6 ring-1 ring-nuit/10">
           {verification ? (
             <p role="status" className="font-medium">
               Vérification de ton paiement avec Wave...
@@ -386,7 +386,7 @@ function Paiement() {
                   : "Tu seras envoyé vers l'application Wave pour valider le paiement."}
               </p>
               <div className="flex flex-wrap gap-3">
-                <button onClick={payerAvecWave} disabled={envoi} className="btn-primary disabled:opacity-50">
+                <button onClick={payerAvecWave} disabled={envoi} className="btn-hero disabled:opacity-50">
                   {envoi ? 'Ouverture de Wave...' : 'Payer avec Wave'}
                 </button>
                 {commande.provider === 'wave' && (
@@ -412,14 +412,16 @@ function Paiement() {
 // useParams() doit être lu sous <Suspense> pour que le site se compile en production
 export default function PagePaiement() {
   return (
-    <Suspense
-      fallback={
-        <p role="status" className="mx-auto mt-16 max-w-2xl px-5 text-center text-lg">
-          Chargement...
-        </p>
-      }
-    >
-      <Paiement />
-    </Suspense>
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]">
+      <Suspense
+        fallback={
+          <p role="status" className="mx-auto mt-16 max-w-2xl px-5 text-center text-lg">
+            Chargement...
+          </p>
+        }
+      >
+        <Paiement />
+      </Suspense>
+    </div>
   )
 }

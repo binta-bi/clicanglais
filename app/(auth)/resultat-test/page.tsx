@@ -55,15 +55,15 @@ export default function ResultatTest() {
 
   if (!tentative || tentative.status === 'en_cours') {
     return (
-      <div className="mx-auto max-w-2xl px-5 py-16">
-        <h1 className="text-3xl font-extrabold tracking-tight">Pas encore de résultat</h1>
-        <p className="mt-3 text-lg text-ink/80">
+      <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]"><div className="mx-auto max-w-2xl px-5 py-16">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Pas encore de résultat</h1>
+        <p className="mt-3 text-lg text-ardoise-texte">
           {tentative ? 'Ce test est encore en cours.' : 'Tu n’as pas encore passé ce test.'}
         </p>
-        <Link href={tentative ? `/test/${code}` : '/niveau'} className="btn-primary mt-6">
+        <Link href={tentative ? `/test/${code}` : '/niveau'} className="btn-hero mt-6">
           {tentative ? 'Reprendre le test' : 'Choisir mon niveau'}
         </Link>
-      </div>
+      </div></div>
     )
   }
 
@@ -73,13 +73,13 @@ export default function ResultatTest() {
     tentative.score !== null && tentative.total ? Math.round((tentative.score / tentative.total) * 100) : null
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-12">
-      <p className="text-lg font-semibold text-ink/70">{info.titre}</p>
-      <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]"><div className="mx-auto max-w-2xl px-5 py-12">
+      <p className="text-lg font-semibold text-ardoise-texte">{info.titre}</p>
+      <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-nuit sm:text-4xl">
         {reussi ? 'Bravo, tu as réussi !' : expire ? 'Le temps est écoulé' : 'Tu n’as pas atteint le seuil'}
       </h1>
 
-      <section className="mt-8 rounded-2xl bg-mist p-6">
+      <section className="mt-8 rounded-3xl bg-white p-6 ring-1 ring-nuit/10 shadow-sm">
         {expire ? (
           <p className="text-lg">
             Tes réponses ont été reçues après la fin du chronomètre. Le test est considéré comme échoué.
@@ -87,7 +87,7 @@ export default function ResultatTest() {
         ) : (
           <>
             <p className="text-5xl font-extrabold tabular-nums">
-              {tentative.score} <span className="text-3xl text-ink/60">/ {tentative.total}</span>
+              {tentative.score} <span className="text-3xl text-ardoise-texte">/ {tentative.total}</span>
             </p>
             <p className="mt-2 text-lg">
               {pourcentage} % de bonnes réponses. Il en fallait au moins {info.bonnesReponses} ({info.seuil} %).
@@ -110,11 +110,11 @@ export default function ResultatTest() {
 
       <div className="mt-8 flex flex-wrap gap-3">
         {etat.suite === 'test1' && etat.test1_disponible ? (
-          <Link href="/test/test1" className="btn-primary">
+          <Link href="/test/test1" className="btn-hero">
             Passer le test Intermédiaire
           </Link>
         ) : (
-          <Link href="/cours" className="btn-primary">
+          <Link href="/cours" className="btn-hero">
             Voir les cours
           </Link>
         )}
@@ -122,6 +122,6 @@ export default function ResultatTest() {
           Mes cours
         </Link>
       </div>
-    </div>
+    </div></div>
   )
 }

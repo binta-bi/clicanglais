@@ -175,7 +175,7 @@ function TestClient() {
     return (
       <div className="mx-auto max-w-3xl px-5 py-16">
         <h1 className="text-2xl font-bold">Test inconnu</h1>
-        <Link href="/niveau" className="btn-primary mt-6">
+        <Link href="/niveau" className="btn-hero mt-6">
           Retour au choix du niveau
         </Link>
       </div>
@@ -203,7 +203,7 @@ function TestClient() {
           Tes réponses sont conservées sur cette page. Vérifie ta connexion puis réessaie.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={envoyer} className="btn-primary">
+          <button onClick={envoyer} className="btn-hero">
             Réessayer l&apos;envoi
           </button>
           <Link href={`/resultat-test?test=${code}`} className="btn-secondary">
@@ -217,8 +217,8 @@ function TestClient() {
   if (etape === 'intro') {
     return (
       <div className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{info.titre}</h1>
-        <ul className="mt-6 flex flex-col gap-3 text-lg leading-snug">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit sm:text-4xl">{info.titre}</h1>
+        <ul className="mt-6 flex flex-col gap-3 rounded-3xl bg-white p-6 text-lg leading-snug ring-1 ring-nuit/10 [&>li]:list-disc [&>li]:ml-5">
           <li>{info.nbQuestions} questions à choix multiple.</li>
           <li>
             {info.minutes} minutes. Le chronomètre démarre quand tu cliques sur « Commencer le test » et
@@ -243,7 +243,7 @@ function TestClient() {
           </p>
         )}
         <div className="mt-8 flex flex-wrap gap-3">
-          <button onClick={commencer} className="btn-primary">
+          <button onClick={commencer} className="btn-hero">
             {reprise ? 'Reprendre le test' : 'Commencer le test'}
           </button>
           <Link href="/niveau" className="btn-secondary">
@@ -260,7 +260,7 @@ function TestClient() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 border-b border-line bg-white">
+      <div className="sticky top-0 z-10 border-b border-line bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3">
           <p className="font-medium">
             {repondues} / {questions.length} réponses
@@ -287,7 +287,7 @@ function TestClient() {
             {q.partie && q.partie !== questions[i - 1]?.partie && (
               <h2 className="mt-4 text-2xl font-extrabold tracking-tight">Questions de niveau {q.partie}</h2>
             )}
-            <fieldset className="rounded-2xl p-5 ring-1 ring-line">
+            <fieldset className="rounded-3xl bg-white p-5 ring-1 ring-nuit/10">
               <legend className="px-1 text-lg font-bold leading-snug">
                 <span className="mr-2 text-brand-dark">{q.position}.</span>
                 {q.question}
@@ -296,7 +296,7 @@ function TestClient() {
                 {q.choices.map((choix) => (
                   <label
                     key={choix}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-line px-4 py-3 hover:bg-mist has-[:checked]:border-navy has-[:checked]:bg-mist"
+                    className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-line bg-white px-4 py-3 transition-colors hover:bg-mist has-[:checked]:border-royal has-[:checked]:bg-mist"
                   >
                     <input
                       type="radio"
@@ -304,7 +304,7 @@ function TestClient() {
                       value={choix}
                       checked={reponses[q.id] === choix}
                       onChange={() => setReponses((r) => ({ ...r, [q.id]: choix }))}
-                      className="size-5 shrink-0 accent-navy"
+                      className="size-5 shrink-0 accent-[#244b78]"
                     />
                     <span>{choix}</span>
                   </label>
@@ -316,7 +316,7 @@ function TestClient() {
 
         <div className="mt-2 flex flex-col gap-3">
           <p className="text-ink/80">Tu peux changer tes réponses jusqu&apos;à l&apos;envoi.</p>
-          <button type="submit" className="btn-primary w-fit">
+          <button type="submit" className="btn-hero w-fit">
             Envoyer mes réponses
           </button>
         </div>
@@ -328,14 +328,16 @@ function TestClient() {
 // useParams() doit être lu sous <Suspense> pour que le site se compile en production
 export default function PageTest() {
   return (
-    <Suspense
-      fallback={
-        <p role="status" className="mx-auto mt-16 max-w-3xl px-5 text-center text-lg">
-          Chargement...
-        </p>
-      }
-    >
-      <TestClient />
-    </Suspense>
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]">
+      <Suspense
+        fallback={
+          <p role="status" className="mx-auto mt-16 max-w-3xl px-5 text-center text-lg">
+            Chargement...
+          </p>
+        }
+      >
+        <TestClient />
+      </Suspense>
+    </div>
   )
 }

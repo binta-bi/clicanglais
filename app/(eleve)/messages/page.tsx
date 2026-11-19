@@ -4,6 +4,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import PhotoProfil from '@/components/PhotoProfil'
 import { Avatar, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
@@ -128,6 +129,7 @@ export default function MessagesEleve() {
       ) : (
         <CarteChat className="h-[calc(100dvh-6.5rem)] min-h-[32rem]">
           <EnteteChat avatar={<Avatar nom="Professeur" />} titre="Messages" sous="Ta conversation avec le professeur" />
+          <PhotoProfil nom="Moi" />
 
           <div aria-live="polite" onLoadCapture={() => fin.current?.scrollIntoView({ block: 'end' })} className="chat-fond flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-4 sm:px-5">
             {messages.length === 0 && (

@@ -1,4 +1,6 @@
+'use client'
 // Éléments d'affichage communs au club et aux messages privés (apparence uniquement, aucune logique).
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 // ---- Dates ---------------------------------------------------------------------------
@@ -37,7 +39,20 @@ export function SeparateurJour({ iso }: { iso: string }) {
 // ---- Avatar (initiales sur fond de couleur) ----------------------------------------------
 const FONDS = ['bg-navy', 'bg-royal', 'bg-brand-dark', 'bg-[#2f7d5b]', 'bg-[#6b4a9c]']
 
-export function Avatar({ nom, className = 'size-11 text-base' }: { nom: string; className?: string }) {
+export function Avatar({ nom, className = 'size-11 text-base', src }: { nom: string; className?: string; src?: string | null }) {
+  const [erreur, setErreur] = useState(false)
+  if (src && !erreur) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        onError={() => setErreur(true)}
+        className={`shrink-0 rounded-full bg-mist object-cover ${className.replace(/\btext-\S+/g, '')}`}
+      />
+    )
+  }
   const mots = nom.trim().split(/\s+/).filter(Boolean)
   const initiales = ((mots[0]?.[0] ?? '?') + (mots.length > 1 ? (mots[mots.length - 1][0] ?? '') : '')).toUpperCase()
   let h = 0
@@ -108,6 +123,7 @@ export function Bulle({
   prof,
   heure,
   actions,
+  avatar,
   children,
 }: {
   mien: boolean
@@ -115,12 +131,14 @@ export function Bulle({
   prof?: boolean
   heure: string
   actions?: ReactNode
+  avatar?: ReactNode // petite photo à gauche des messages des autres
   children: ReactNode
 }) {
   return (
-    <div className={`flex ${mien ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-end gap-2 ${mien ? 'justify-end' : 'justify-start'}`}>
+      {!mien && avatar}
       <div
-        className={`max-w-[88%] break-words rounded-2xl px-3.5 pb-1.5 pt-2 shadow-sm sm:max-w-[75%] ${
+        className={`max-w-[80%] break-words rounded-2xl px-3.5 pb-1.5 pt-2 shadow-sm sm:max-w-[72%] ${
           mien ? 'bulle-mien rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white text-ink ring-1 ring-line'
         }`}
       >

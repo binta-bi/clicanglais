@@ -4,7 +4,9 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
-import { Bandeau, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeGroupe, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
+import PhotoProfil from '@/components/PhotoProfil'
+import { useAvatars, oublierAvatar } from '@/lib/avatars'
+import { Avatar, Bandeau, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeGroupe, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
@@ -39,6 +41,8 @@ export default function Club() {
   const [messages, setMessages] = useState<Message[]>([])
   const [exclus, setExclus] = useState<Exclu[]>([])
   const [texte, setTexte] = useState('')
+  const [versionPhotos, setVersionPhotos] = useState(0)
+  const photos = useAvatars(messages.map((m) => m.auteur_id), versionPhotos)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
   const fin = useRef<HTMLDivElement>(null)
@@ -132,6 +136,17 @@ export default function Club() {
 
   async function envoyerPiece(piece: Piece) {
     return envoyerMessage(texte, piece)
+  }
+
+  async function retirerPhoto(m: Message) {
+    if (!window.confirm(`Retirer la photo de ${m.auteur} ?`)) return
+    const { error } = await supabase.rpc('prof_retirer_avatar', { p_id: m.auteur_id })
+    if (error) {
+      setErreur(error.message)
+      return
+    }
+    oublierAvatar(m.auteur_id)
+    setVersionPhotos((v) => v + 1)
   }
 
   async function supprimer(m: Message) {
@@ -236,6 +251,7 @@ export default function Club() {
           Échange avec les autres élèves de ton niveau et le professeur. Reste poli et ne partage pas d&apos;informations
           personnelles (numéro de téléphone, mot de passe).
         </Bandeau>
+        <PhotoProfil nom="Moi" />
 
         <div
           role="log"
@@ -260,12 +276,18 @@ export default function Club() {
                   auteur={m.auteur}
                   prof={m.est_prof}
                   heure={heureCourte(m.created_at)}
+                  avatar={<Avatar nom={m.auteur} src={photos[m.auteur_id]} className="size-8 text-xs" />}
                   actions={
                     estProf && (
                       <>
                         {!mien && !m.est_prof && (
                           <button type="button" onClick={() => exclure(m)} className="bulle-action">
                             Retirer du club
+                          </button>
+                        )}
+                        {!mien && !m.est_prof && photos[m.auteur_id] && (
+                          <button type="button" onClick={() => retirerPhoto(m)} className="bulle-action">
+                            Retirer la photo
                           </button>
                         )}
                         <button type="button" onClick={() => supprimer(m)} className="bulle-action">

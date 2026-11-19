@@ -2,6 +2,7 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
+import { useAvatars } from '@/lib/avatars'
 import { Avatar, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeFleche, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
@@ -153,6 +154,7 @@ export default function AdminMessages() {
     : []
 
   const nomAffiche = eleve?.full_name || nomChoisi || 'Élève'
+  const photos = useAvatars([...conversations.map((c) => c.student_id), ...inscrits.map((i) => i.id), ...(choisi ? [choisi] : [])])
 
   return (
     <div className="flex flex-col gap-4">
@@ -189,7 +191,7 @@ export default function AdminMessages() {
                   onClick={() => ouvrir(i.id, i.nom)}
                   className="flex w-full items-center gap-3 rounded-xl border border-line p-2.5 text-left text-sm hover:bg-mist"
                 >
-                  <Avatar nom={i.nom} className="size-9 text-sm" />
+                  <Avatar nom={i.nom} src={photos[i.id]} className="size-9 text-sm" />
                   <span className="min-w-0">
                     <strong>{i.nom}</strong>
                     <span className="block break-all text-gray-500">
@@ -220,7 +222,7 @@ export default function AdminMessages() {
                   c.student_id === choisi ? 'bg-mist ring-navy' : 'bg-white ring-line hover:bg-mist'
                 }`}
               >
-                <Avatar nom={c.full_name || 'Élève'} />
+                <Avatar nom={c.full_name || 'Élève'} src={photos[c.student_id]} />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center justify-between gap-2">
                     <strong className="truncate">{c.full_name || 'Élève'}</strong>
@@ -245,7 +247,7 @@ export default function AdminMessages() {
           <CarteChat className="h-[75dvh] min-h-[30rem]">
             <EnteteChat
               h2
-              avatar={<Avatar nom={nomAffiche} />}
+              avatar={<Avatar nom={nomAffiche} src={choisi ? photos[choisi] : null} />}
               titre={nomAffiche}
               sous="Conversation privée"
               gauche={
@@ -274,6 +276,7 @@ export default function AdminMessages() {
                     <Bulle
                       mien={mien}
                       auteur={mien ? undefined : nomAffiche}
+                      avatar={<Avatar nom={nomAffiche} src={choisi ? photos[choisi] : null} className="size-8 text-xs" />}
                       heure={heureCourte(m.created_at)}
                       actions={
                         <button type="button" onClick={() => supprimerMessage(m)} className="bulle-action">

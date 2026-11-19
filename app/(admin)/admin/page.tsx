@@ -174,7 +174,6 @@ const RACCOURCIS: { href: string; nom: string; icone: ReactNode }[] = [
 ]
 
 export default function AdminAccueil() {
-  const [prenom, setPrenom] = useState('')
   const [stats, setStats] = useState<Stats | null>(null)
   const [eleves, setEleves] = useState<Eleve[]>([])
   const [paiements, setPaiements] = useState<Paiement[]>([])
@@ -189,11 +188,7 @@ export default function AdminAccueil() {
   useEffect(() => {
     let annule = false
     async function charger() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      const [prof, st, el, pa, tests, evals, cv, att] = await Promise.all([
-        user ? supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle() : Promise.resolve({ data: null }),
+      const [st, el, pa, tests, evals, cv, att] = await Promise.all([
         supabase.rpc('admin_stats'),
         supabase.rpc('prof_eleves'),
         supabase.rpc('prof_paiements'),
@@ -207,8 +202,6 @@ export default function AdminAccueil() {
       if (c.error) c = (await supabase.from('courses').select('id, title, is_published')) as typeof c
       if (annule) return
 
-      const nom = (prof.data as { full_name: string | null } | null)?.full_name?.trim() ?? ''
-      setPrenom(nom.split(/\s+/)[0] ?? '')
       if (st.error) setErreur(st.error.message)
       else setStats(st.data as Stats)
       setEleves((el.data as Eleve[]) || [])
@@ -251,7 +244,7 @@ export default function AdminAccueil() {
     <div className="flex flex-col gap-8 pb-12">
       <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-nuit via-navy to-royal p-6 text-white shadow-[0_24px_50px_-30px_rgb(20_36_58/0.8)] sm:p-8">
         <h1 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
-          {prenom ? `Bonjour ${prenom}` : 'Espace professeur'}
+          Bonjour, professeur
         </h1>
         <p className="mt-2 max-w-xl text-lg text-white/85">
           Voici l’activité de ta plateforme : élèves, ventes et messages, en un coup d’œil.

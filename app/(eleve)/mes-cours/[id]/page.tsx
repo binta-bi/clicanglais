@@ -64,59 +64,68 @@ function Lecteur() {
   const lesson = lessons[current]
   const segments = lesson.transcription || []
 
+  const pct = Math.round((vues.filter((v) => lessons.some((l) => l.id === v)).length / lessons.length) * 100)
+
   return (
-    <div className="max-w-5xl mx-auto mt-6 px-4 flex flex-col gap-4">
-      <Link href="/mes-cours" className="text-sm text-[#2d3a6b]">← Mes cours</Link>
-      <h1 className="text-2xl font-bold">{lesson.title}</h1>
-      <p className="text-sm text-gray-500">
-        {vues.length} / {lessons.length} leçons vues
-      </p>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="md:col-span-2 flex flex-col gap-4">
-          <LecteurVideo
-            key={lesson.id}
-            ref={lecteurRef}
-            url={lesson.video_url}
-            onTemps={setTemps}
-            onFin={() => marquerVue(lesson.id)}
-          />
-
-          <div className="border rounded p-3 max-h-64 overflow-y-auto flex flex-col gap-1">
-            {segments.length === 0 && (
-              <p className="text-gray-500 text-sm">Pas de transcription pour cette leçon.</p>
-            )}
-            {segments.map((s, i) => {
-              const actif = temps >= s.start && temps < s.end
-              return (
-                <button
-                  key={i}
-                  ref={actif ? actifRef : null}
-                  onClick={() => lecteurRef.current?.chercher(s.start)}
-                  className={`text-left p-2 rounded ${
-                    actif ? 'bg-[#e8652d] text-white' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  {s.text}
-                </button>
-              )
-            })}
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)] pb-12">
+      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pt-6">
+        <Link href="/mes-cours" className="text-sm font-semibold text-royal">← Mes cours</Link>
+        <h1 className="text-2xl font-extrabold tracking-tight text-nuit sm:text-3xl">{lesson.title}</h1>
+        <div>
+          <p className="text-sm text-ardoise-texte">
+            {vues.length} / {lessons.length} leçons vues
+          </p>
+          <div className="mt-1 h-2 max-w-xs overflow-hidden rounded-full bg-white ring-1 ring-nuit/10" aria-hidden="true">
+            <div className="h-full rounded-full bg-cuivre" style={{ width: `${Math.min(100, pct)}%` }} />
           </div>
         </div>
 
-        <div className="border rounded p-3 flex flex-col gap-1 h-fit">
-          <h2 className="font-bold mb-1">Leçons</h2>
-          {lessons.map((l, i) => (
-            <button
-              key={l.id}
-              onClick={() => setCurrent(i)}
-              className={`text-left p-2 rounded ${
-                i === current ? 'bg-[#2d3a6b] text-white' : 'hover:bg-gray-100'
-              }`}
-            >
-              {vues.includes(l.id) ? '✓ ' : ''}{l.title}
-            </button>
-          ))}
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="md:col-span-2 flex flex-col gap-4">
+            <LecteurVideo
+              key={lesson.id}
+              ref={lecteurRef}
+              url={lesson.video_url}
+              onTemps={setTemps}
+              onFin={() => marquerVue(lesson.id)}
+            />
+
+            <div className="flex max-h-64 flex-col gap-1 overflow-y-auto rounded-2xl bg-white p-3 ring-1 ring-nuit/10">
+              {segments.length === 0 && (
+                <p className="text-sm text-ardoise-texte">Pas de transcription pour cette leçon.</p>
+              )}
+              {segments.map((s, i) => {
+                const actif = temps >= s.start && temps < s.end
+                return (
+                  <button
+                    key={i}
+                    ref={actif ? actifRef : null}
+                    onClick={() => lecteurRef.current?.chercher(s.start)}
+                    className={`rounded-lg p-2 text-left ${
+                      actif ? 'bg-nuit text-white' : 'hover:bg-mist'
+                    }`}
+                  >
+                    {s.text}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="flex h-fit flex-col gap-1 rounded-2xl bg-white p-3 ring-1 ring-nuit/10">
+            <h2 className="mb-1 font-extrabold text-nuit">Leçons</h2>
+            {lessons.map((l, i) => (
+              <button
+                key={l.id}
+                onClick={() => setCurrent(i)}
+                className={`rounded-lg p-2 text-left ${
+                  i === current ? 'bg-nuit font-bold text-white' : 'hover:bg-mist'
+                }`}
+              >
+                {vues.includes(l.id) ? '✓ ' : ''}{l.title}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

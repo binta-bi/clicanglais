@@ -43,60 +43,69 @@ export default function Evaluations() {
   const niveaux = Array.from(new Set(lignes.map((l) => l.niveau)))
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 px-4 pb-16 flex flex-col gap-6">
-      <Link href="/mes-cours" className="text-sm text-[#2d3a6b]">
-        ← Mes cours
-      </Link>
-      <h1 className="text-2xl font-bold">Mes évaluations</h1>
-      <p>
-        Une évaluation se passe une seule fois. Elle est chronométrée : si tu quittes la page, elle se termine
-        aussitôt.
-      </p>
-
-      {chargement && <p role="status">Chargement...</p>}
-      {erreur && (
-        <p role="alert" className="text-red-700">
-          {erreur}
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10 sm:py-14">
+        <Link href="/mes-cours" className="text-sm font-semibold text-royal">
+          ← Mes cours
+        </Link>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit sm:text-4xl">Mes évaluations</h1>
+        <p className="rounded-2xl bg-white p-4 text-ardoise-texte ring-1 ring-nuit/10">
+          Une évaluation se passe une seule fois. Elle est chronométrée : si tu quittes la page, elle se termine
+          aussitôt.
         </p>
-      )}
-      {!chargement && lignes.length === 0 && (
-        <div className="rounded-2xl bg-mist p-5">Aucune évaluation n&apos;est disponible pour l&apos;instant.</div>
-      )}
 
-      {niveaux.map((n) => (
-        <section key={n} className="flex flex-col gap-3">
-          <h2 className="text-lg font-bold">Niveau {NOM_NIVEAU[n]}</h2>
-          {lignes
-            .filter((l) => l.niveau === n)
-            .map((l) => (
-              <div key={l.code} className="border rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="font-bold">{l.titre}</p>
-                  <p className="text-sm text-gray-600">
-                    {l.fait
-                      ? `Terminée · ${l.score} / ${l.total}`
-                      : l.accessible
-                        ? `${l.duree_minutes} minutes · une seule tentative`
-                        : l.mois
-                          ? 'Disponible après l’achat de ce mois'
-                          : 'Disponible quand les 3 mois du niveau sont acquis'}
-                  </p>
+        {chargement && <p role="status">Chargement...</p>}
+        {erreur && (
+          <p role="alert" className="text-red-700">
+            {erreur}
+          </p>
+        )}
+        {!chargement && lignes.length === 0 && (
+          <div className="rounded-2xl bg-white p-5 ring-1 ring-nuit/10">
+            Aucune évaluation n&apos;est disponible pour l&apos;instant.
+          </div>
+        )}
+
+        {niveaux.map((n) => (
+          <section key={n} className="flex flex-col gap-3">
+            <h2 className="text-lg font-extrabold text-nuit">Niveau {NOM_NIVEAU[n]}</h2>
+            {lignes
+              .filter((l) => l.niveau === n)
+              .map((l) => (
+                <div
+                  key={l.code}
+                  className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 ring-1 ring-nuit/10 ${
+                    !l.accessible && !l.fait ? 'opacity-70' : ''
+                  }`}
+                >
+                  <div>
+                    <p className="font-extrabold text-nuit">{l.titre}</p>
+                    <p className="text-sm text-ardoise-texte">
+                      {l.fait
+                        ? `Terminée · ${l.score} / ${l.total}`
+                        : l.accessible
+                          ? `${l.duree_minutes} minutes · une seule tentative`
+                          : l.mois
+                            ? 'Disponible après l’achat de ce mois'
+                            : 'Disponible quand les 3 mois du niveau sont acquis'}
+                    </p>
+                  </div>
+                  {l.fait ? (
+                    <Link href={`/evaluations/${l.code}`} className="btn-secondary">
+                      Voir mon résultat
+                    </Link>
+                  ) : l.accessible ? (
+                    <Link href={`/evaluations/${l.code}`} className="btn-hero">
+                      Passer l&apos;évaluation
+                    </Link>
+                  ) : (
+                    <span className="text-sm text-ardoise-texte">Verrouillée</span>
+                  )}
                 </div>
-                {l.fait ? (
-                  <Link href={`/evaluations/${l.code}`} className="btn-secondary">
-                    Voir mon résultat
-                  </Link>
-                ) : l.accessible ? (
-                  <Link href={`/evaluations/${l.code}`} className="btn-primary">
-                    Passer l&apos;évaluation
-                  </Link>
-                ) : (
-                  <span className="text-sm text-gray-500">Verrouillée</span>
-                )}
-              </div>
-            ))}
-        </section>
-      ))}
+              ))}
+          </section>
+        ))}
+      </div>
     </div>
   )
 }

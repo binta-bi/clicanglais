@@ -44,18 +44,18 @@ export default function AdminAvis() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">Avis des élèves</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Avis des élèves</h1>
       {erreur && (
         <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
           {erreur}
         </p>
       )}
       {!pret && <p>Chargement...</p>}
-      {pret && lignes.length === 0 && <p className="text-gray-500">Aucun avis pour l&apos;instant.</p>}
+      {pret && lignes.length === 0 && <p className="text-ardoise-texte">Aucun avis pour l&apos;instant.</p>}
       <ul className="flex flex-col gap-3">
         {lignes.map((l) => (
           <li key={l.id} className="rounded-2xl border p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-ardoise-texte">
               <p>
                 <strong className="text-base text-black">{l.profiles?.full_name || 'Élève'}</strong>
                 {' · '}
@@ -67,7 +67,7 @@ export default function AdminAvis() {
             <p className="mt-2 whitespace-pre-line break-words">{l.content}</p>
             <button
               onClick={() => supprimer(l)}
-              className="mt-3 rounded border border-red-500 px-3 py-1 text-sm text-red-500"
+              className="mt-3 rounded-full border-2 border-red-500 px-4 py-1 text-sm font-semibold text-red-600 hover:bg-red-50"
             >
               Supprimer
             </button>

@@ -65,9 +65,9 @@ function CartePaiement({ p, onChange }: { p: Paiement; onChange: () => void }) {
     <li className="flex flex-col gap-2 rounded-2xl border-2 border-line p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="font-bold">{p.eleve}</p>
-        <p className="text-sm text-gray-500">{quand(p.declare_le)}</p>
+        <p className="text-sm text-ardoise-texte">{quand(p.declare_le)}</p>
       </div>
-      {p.email && <p className="text-sm break-all text-gray-600">{p.email}</p>}
+      {p.email && <p className="text-sm break-all text-ardoise-texte">{p.email}</p>}
       <p className="text-lg font-medium">{p.achat}</p>
       <p className="text-2xl font-extrabold tabular-nums">{fcfa(p.montant)}</p>
       <p className="text-sm">
@@ -93,7 +93,7 @@ function CartePaiement({ p, onChange }: { p: Paiement; onChange: () => void }) {
                 <input
                   value={motif}
                   onChange={(e) => setMotif(e.target.value)}
-                  className="rounded-xl border-2 border-line px-3 py-2 font-normal"
+                  className="champ-auth !py-2 font-normal"
                 />
               </label>
               <div className="flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ function CartePaiement({ p, onChange }: { p: Paiement; onChange: () => void }) {
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <button onClick={valider} disabled={envoi} className="btn-primary disabled:opacity-50">
+              <button onClick={valider} disabled={envoi} className="btn-hero disabled:opacity-50">
                 {envoi ? 'Validation...' : 'Valider'}
               </button>
               <button
@@ -181,7 +181,7 @@ function DonnerAcces({ cours, onFini, offert = false }: { cours: CoursMois[]; on
         Email de l&apos;élève
         <input
           type="email" value={email} required onChange={(e) => setEmail(e.target.value)}
-          className="rounded-xl border-2 border-line px-3 py-2 font-normal"
+          className="champ-auth !py-2 font-normal"
         />
       </label>
       <fieldset className="flex flex-wrap gap-4 text-sm">
@@ -198,7 +198,7 @@ function DonnerAcces({ cours, onFini, offert = false }: { cours: CoursMois[]; on
           Cours
           <select
             value={coursId} onChange={(e) => setCoursId(e.target.value)}
-            className="rounded-xl border-2 border-line px-3 py-2 font-normal"
+            className="champ-auth !py-2 font-normal"
           >
             <option value="">— Choisir —</option>
             {cours.map((c) => (
@@ -211,7 +211,7 @@ function DonnerAcces({ cours, onFini, offert = false }: { cours: CoursMois[]; on
           Niveau
           <select
             value={niveau} onChange={(e) => setNiveau(e.target.value)}
-            className="rounded-xl border-2 border-line px-3 py-2 font-normal"
+            className="champ-auth !py-2 font-normal"
           >
             {NIVEAUX.map((n) => (
               <option key={n.slug} value={n.slug}>{n.nom}</option>
@@ -221,7 +221,7 @@ function DonnerAcces({ cours, onFini, offert = false }: { cours: CoursMois[]; on
       )}
       {erreur && <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">{erreur}</p>}
       {message && <p role="status" className="rounded-xl bg-mist p-3 font-medium">{message}</p>}
-      <button type="submit" disabled={envoi} className="btn-primary self-start disabled:opacity-50">
+      <button type="submit" disabled={envoi} className="btn-hero self-start disabled:opacity-50">
         {envoi ? 'Envoi...' : offert ? 'Offrir l’accès' : 'Donner l’accès'}
       </button>
     </form>
@@ -268,7 +268,7 @@ export default function PagePaiements() {
 
   return (
     <div className="flex flex-col gap-10">
-      <h1 className="text-2xl font-bold">Paiements</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Paiements</h1>
 
       {erreur && (
         <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
@@ -277,11 +277,11 @@ export default function PagePaiements() {
       )}
 
       <section aria-labelledby="pa-attente" className="flex flex-col gap-4">
-        <h2 id="pa-attente" className="text-xl font-bold">
+        <h2 id="pa-attente" className="text-xl font-extrabold text-nuit">
           À valider ({attente.length})
         </h2>
         {attente.length === 0 ? (
-          <p className="text-gray-500">Aucun paiement en attente.</p>
+          <p className="text-ardoise-texte">Aucun paiement en attente.</p>
         ) : (
           <ul className="grid gap-4 md:grid-cols-2">
             {attente.map((p) => (
@@ -292,20 +292,20 @@ export default function PagePaiements() {
       </section>
 
       <section aria-labelledby="pa-acces" className="flex flex-col gap-4">
-        <h2 id="pa-acces" className="text-xl font-bold">
+        <h2 id="pa-acces" className="text-xl font-extrabold text-nuit">
           Donner un accès directement
         </h2>
         <DonnerAcces cours={cours} onFini={charger} />
       </section>
 
       <section aria-labelledby="pa-offrir" className="flex flex-col gap-4">
-        <h2 id="pa-offrir" className="text-xl font-bold">
+        <h2 id="pa-offrir" className="text-xl font-extrabold text-nuit">
           Offrir un accès (gratuit)
         </h2>
         <DonnerAcces cours={cours} onFini={charger} offert />
         {offerts.length > 0 && (
           <div>
-            <h3 className="mb-2 font-bold">Accès offerts ({offerts.length})</h3>
+            <h3 className="mb-2 font-extrabold text-nuit">Accès offerts ({offerts.length})</h3>
             <ul className="flex flex-col gap-1 text-sm">
               {offerts.map((o, i) => (
                 <li key={i}>
@@ -318,11 +318,11 @@ export default function PagePaiements() {
       </section>
 
       <section aria-labelledby="pa-traites" className="flex flex-col gap-4">
-        <h2 id="pa-traites" className="text-xl font-bold">
+        <h2 id="pa-traites" className="text-xl font-extrabold text-nuit">
           Déjà traités
         </h2>
         {traites.length === 0 ? (
-          <p className="text-gray-500">Rien pour l&apos;instant.</p>
+          <p className="text-ardoise-texte">Rien pour l&apos;instant.</p>
         ) : (
           <ul className="grid gap-4 md:grid-cols-2">
             {traites.map((p) => (

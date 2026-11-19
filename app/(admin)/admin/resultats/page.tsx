@@ -139,13 +139,13 @@ export default function Resultats() {
     }
   }
 
-  const sel = 'rounded border p-2'
+  const sel = 'champ-auth !py-2'
   const th = 'px-3 py-2 font-medium'
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Résultats</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Résultats</h1>
+      <p className="text-sm text-ardoise-texte">
         Notes des tests de niveau et des évaluations, avec la mention calculée selon tes seuils.
       </p>
       {erreur && (
@@ -163,7 +163,7 @@ export default function Resultats() {
         <p role="status">Chargement...</p>
       ) : (
         <>
-          <details className="rounded border p-3">
+          <details className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line">
             <summary className="cursor-pointer font-medium">
               Régler les mentions (actuellement : {seuils.map((s, i) => `${NOMS_SEUILS[i]} dès ${s} %`).join(', ')})
             </summary>
@@ -181,11 +181,11 @@ export default function Resultats() {
                   />
                 </label>
               ))}
-              <button type="submit" className="rounded bg-[#2d3a6b] px-4 py-2 text-white">
+              <button type="submit" className="rounded-full bg-navy px-5 py-2 font-bold text-white hover:bg-nuit">
                 Enregistrer
               </button>
             </form>
-            <p className="mt-2 text-sm text-gray-600">En dessous du premier seuil, la mention est « Insuffisant ».</p>
+            <p className="mt-2 text-sm text-ardoise-texte">En dessous du premier seuil, la mention est « Insuffisant ».</p>
           </details>
 
           <div className="flex flex-wrap items-end gap-3">
@@ -226,23 +226,23 @@ export default function Resultats() {
               Rechercher (nom ou email)
               <input type="search" value={recherche} onChange={(e) => setRecherche(e.target.value)} className={`${sel} w-56`} />
             </label>
-            <button type="button" onClick={exporter} disabled={filtres.length === 0} className="rounded border px-3 py-2 text-sm disabled:opacity-50">
+            <button type="button" onClick={exporter} disabled={filtres.length === 0} className="rounded-full border-2 border-line bg-white px-4 py-2 text-sm font-semibold text-nuit hover:border-royal disabled:opacity-50">
               Exporter en Excel (CSV)
             </button>
           </div>
 
-          <p className="text-sm text-gray-600" aria-live="polite">
+          <p className="text-sm text-ardoise-texte" aria-live="polite">
             {vue === 'epreuve'
               ? `${filtres.length} résultat${filtres.length > 1 ? 's' : ''}`
               : `${parEleve.length} élève${parEleve.length > 1 ? 's' : ''}`}
           </p>
 
           {filtres.length === 0 ? (
-            <p className="text-gray-500">Aucun résultat pour l’instant.</p>
+            <p className="text-ardoise-texte">Aucun résultat pour l’instant.</p>
           ) : vue === 'epreuve' ? (
-            <div className="overflow-x-auto rounded border">
+            <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-line">
               <table className="w-full min-w-[52rem] text-left text-sm">
-                <thead className="bg-gray-50 text-gray-600">
+                <thead className="bg-mist text-ardoise-texte">
                   <tr>
                     <th scope="col" className={th}>Nom</th>
                     <th scope="col" className={th}>Email</th>
@@ -256,7 +256,7 @@ export default function Resultats() {
                 </thead>
                 <tbody>
                   {filtres.map((l) => (
-                    <tr key={`${l.type}-${l.code}-${l.student_id}`} className="border-t">
+                    <tr key={`${l.type}-${l.code}-${l.student_id}`} className="border-t border-line">
                       <th scope="row" className="px-3 py-2 font-medium">{l.nom}</th>
                       <td className="break-all px-3 py-2">{l.email}</td>
                       <td className="px-3 py-2">{l.titre}</td>
@@ -271,9 +271,9 @@ export default function Resultats() {
               </table>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded border">
+            <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-line">
               <table className="w-full min-w-[48rem] text-left text-sm">
-                <thead className="bg-gray-50 text-gray-600">
+                <thead className="bg-mist text-ardoise-texte">
                   <tr>
                     <th scope="col" className={th}>Nom</th>
                     <th scope="col" className={th}>Email</th>

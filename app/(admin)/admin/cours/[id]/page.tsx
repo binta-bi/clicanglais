@@ -86,17 +86,17 @@ function EditerLecon({
   }
 
   return (
-    <form onSubmit={enregistrer} className="border rounded p-4 flex flex-col gap-3 bg-gray-50">
+    <form onSubmit={enregistrer} className="rounded-2xl bg-mist p-4 flex flex-col gap-3 ring-1 ring-line">
       <h3 className="font-bold">Modifier la leçon</h3>
       <label className="flex flex-col gap-1 text-sm font-medium">
         Titre
-        <input value={titre} required onChange={(e) => setTitre(e.target.value)} className="border p-2 rounded font-normal bg-white" />
+        <input value={titre} required onChange={(e) => setTitre(e.target.value)} className="champ-auth !py-2 font-normal" />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium">
         Lien de la vidéo
-        <input type="url" value={lien} required onChange={(e) => setLien(e.target.value)} className="border p-2 rounded font-normal bg-white" />
+        <input type="url" value={lien} required onChange={(e) => setLien(e.target.value)} className="champ-auth !py-2 font-normal" />
       </label>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-ardoise-texte">
         {lecon.transcription?.length
           ? `Transcription actuelle : ${lecon.transcription.length} phrases.`
           : 'Cette leçon n\u2019a pas de transcription.'}
@@ -113,10 +113,10 @@ function EditerLecon({
       )}
       {erreur && <p role="alert" className="text-red-500 text-sm">{erreur}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white px-4 py-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={envoi} className="rounded-full bg-navy px-5 py-2.5 font-bold text-white transition-colors hover:bg-nuit disabled:opacity-50">
           {envoi ? 'Enregistrement...' : 'Enregistrer'}
         </button>
-        <button type="button" onClick={onAnnuler} className="border px-4 py-2 rounded">Annuler</button>
+        <button type="button" onClick={onAnnuler} className="rounded-full border-2 border-line bg-white px-5 py-2 font-semibold text-nuit hover:border-royal">Annuler</button>
       </div>
     </form>
   )
@@ -203,24 +203,24 @@ function AdminLecons() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <Link href="/admin/cours" className="text-sm text-[#2d3a6b]">← Mes cours</Link>
-        <h1 className="text-2xl font-bold mt-2">Leçons : {titreCours}</h1>
-        <Link href={`/admin/cours/${id}/modifier`} className="inline-block mt-2 text-sm border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded">
+        <Link href="/admin/cours" className="text-sm font-semibold text-royal">← Mes cours</Link>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit mt-2">Leçons : {titreCours}</h1>
+        <Link href={`/admin/cours/${id}/modifier`} className="inline-block mt-2 text-sm rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white">
           Modifier les infos du cours
         </Link>
       </div>
 
-      <form onSubmit={ajouter} className="border rounded p-4 flex flex-col gap-3 max-w-xl">
+      <form onSubmit={ajouter} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-col gap-3 max-w-xl">
         <h2 className="font-bold">Nouvelle leçon</h2>
         <input
           placeholder="Titre de la leçon" value={title} required
           onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded"
+          className="champ-auth !py-2"
         />
         <input
           type="url" placeholder="Lien de la vidéo (https://...)" value={videoUrl} required
           onChange={(e) => setVideoUrl(e.target.value)}
-          className="border p-2 rounded"
+          className="champ-auth !py-2"
         />
         <label className="text-sm flex flex-col gap-1">
           Transcription (fichier .srt ou .vtt, facultatif)
@@ -230,13 +230,13 @@ function AdminLecons() {
           />
         </label>
         {message && <p className="text-red-500 text-sm">{message}</p>}
-        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white p-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={envoi} className="rounded-xl bg-navy px-4 py-2 font-bold text-white hover:bg-nuit disabled:opacity-50">
           {envoi ? 'Ajout...' : 'Ajouter la leçon'}
         </button>
       </form>
 
       <div className="flex flex-col gap-3">
-        {lessons.length === 0 && <p className="text-gray-500">Aucune leçon pour l&apos;instant.</p>}
+        {lessons.length === 0 && <p className="text-ardoise-texte">Aucune leçon pour l&apos;instant.</p>}
         {lessons.map((l, i) =>
           edition === l.id ? (
             <EditerLecon
@@ -249,20 +249,20 @@ function AdminLecons() {
               onAnnuler={() => setEdition(null)}
             />
           ) : (
-            <div key={l.id} className="border rounded p-4 flex flex-wrap items-center justify-between gap-3">
+            <div key={l.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-bold">{i + 1}. {l.title}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-ardoise-texte">
                   {l.transcription?.length
                     ? `Transcription : ${l.transcription.length} phrases`
                     : 'Pas de transcription'}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 text-sm">
-                <button onClick={() => deplacer(i, -1)} disabled={i === 0} className="border px-3 py-1 rounded disabled:opacity-30">↑</button>
-                <button onClick={() => deplacer(i, 1)} disabled={i === lessons.length - 1} className="border px-3 py-1 rounded disabled:opacity-30">↓</button>
-                <button onClick={() => setEdition(l.id)} className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded">Modifier</button>
-                <button onClick={() => supprimer(l)} className="border border-red-500 text-red-500 px-3 py-1 rounded">Supprimer</button>
+                <button onClick={() => deplacer(i, -1)} disabled={i === 0} className="rounded-full border-2 border-line bg-white px-4 py-1.5 font-semibold text-nuit hover:border-royal disabled:opacity-30">↑</button>
+                <button onClick={() => deplacer(i, 1)} disabled={i === lessons.length - 1} className="rounded-full border-2 border-line bg-white px-4 py-1.5 font-semibold text-nuit hover:border-royal disabled:opacity-30">↓</button>
+                <button onClick={() => setEdition(l.id)} className="rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white">Modifier</button>
+                <button onClick={() => supprimer(l)} className="rounded-full border-2 border-red-500 px-4 py-1.5 font-semibold text-red-600 hover:bg-red-50">Supprimer</button>
               </div>
             </div>
           ),

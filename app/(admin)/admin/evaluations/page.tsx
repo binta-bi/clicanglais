@@ -34,8 +34,8 @@ export default function PageEvaluations() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">Évaluations</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Évaluations</h1>
+      <p className="text-sm text-ardoise-texte">
         Une évaluation par mois et une par niveau. Les élèves la passent une seule fois, en 30 minutes. Elle
         n&apos;apparaît chez eux qu&apos;une fois publiée.
       </p>
@@ -46,14 +46,14 @@ export default function PageEvaluations() {
       )}
       {(['debutant', 'intermediaire', 'avance'] as NiveauSlug[]).map((n) => (
         <section key={n} className="flex flex-col gap-3">
-          <h2 className="text-lg font-bold">Niveau {NOM_NIVEAU[n]}</h2>
+          <h2 className="text-lg font-extrabold text-nuit">Niveau {NOM_NIVEAU[n]}</h2>
           {lignes
             .filter((l) => l.niveau === n)
             .map((l) => (
-              <div key={l.code} className="border rounded p-4 flex flex-wrap items-center justify-between gap-3">
+              <div key={l.code} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="font-bold">{l.titre}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-ardoise-texte">
                     {l.nb_questions} question{l.nb_questions > 1 ? 's' : ''} ·{' '}
                     {l.is_published ? 'Publiée' : 'Brouillon'} · {l.nb_tentatives} passage
                     {l.nb_tentatives > 1 ? 's' : ''}
@@ -62,7 +62,7 @@ export default function PageEvaluations() {
                 </div>
                 <Link
                   href={`/admin/evaluations/${l.code}`}
-                  className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded text-sm"
+                  className="rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white text-sm"
                 >
                   Gérer
                 </Link>

@@ -34,11 +34,11 @@ function csv(eleves: Eleve[]) {
 }
 
 function Tableau({ lignes, vide }: { lignes: Eleve[]; vide: string }) {
-  if (lignes.length === 0) return <p className="text-gray-500">{vide}</p>
+  if (lignes.length === 0) return <p className="text-ardoise-texte">{vide}</p>
   return (
-    <div className="overflow-x-auto rounded border">
+    <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-line">
       <table className="w-full min-w-[48rem] text-left text-sm">
-        <thead className="bg-gray-50 text-gray-600">
+        <thead className="bg-mist text-ardoise-texte">
           <tr>
             <th scope="col" className="px-3 py-2 font-medium">Nom</th>
             <th scope="col" className="px-3 py-2 font-medium">Email</th>
@@ -51,7 +51,7 @@ function Tableau({ lignes, vide }: { lignes: Eleve[]; vide: string }) {
         </thead>
         <tbody>
           {lignes.map((e) => (
-            <tr key={e.id} className="border-t">
+            <tr key={e.id} className="border-t border-line">
               <th scope="row" className="px-3 py-2 font-medium">{e.nom}</th>
               <td className="break-all px-3 py-2">{e.email}</td>
               <td className="px-3 py-2 whitespace-nowrap">
@@ -125,7 +125,7 @@ export default function Eleves() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Élèves inscrits</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Élèves inscrits</h1>
       {erreur && (
         <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
           {erreur}
@@ -142,11 +142,11 @@ export default function Eleves() {
                 type="search"
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
-                className="w-72 max-w-full rounded border p-2"
+                className="champ-auth !py-2 w-72 max-w-full"
               />
             </label>
             <div className="flex items-center gap-3">
-              <p className="text-sm text-gray-600" aria-live="polite">
+              <p className="text-sm text-ardoise-texte" aria-live="polite">
                 {filtres.length} élève{filtres.length > 1 ? 's' : ''}
                 {recherche.trim() ? ` sur ${eleves.length}` : ''}
               </p>
@@ -154,7 +154,7 @@ export default function Eleves() {
                 type="button"
                 onClick={exporter}
                 disabled={filtres.length === 0}
-                className="rounded border px-3 py-2 text-sm disabled:opacity-50"
+                className="rounded-full border-2 border-line bg-white px-4 py-2 text-sm font-semibold text-nuit hover:border-royal disabled:opacity-50"
               >
                 Exporter en Excel (CSV)
               </button>
@@ -162,17 +162,17 @@ export default function Eleves() {
           </div>
 
           {filtres.length === 0 ? (
-            <p className="text-gray-500">{eleves.length === 0 ? 'Aucun élève inscrit pour l’instant.' : 'Aucun résultat.'}</p>
+            <p className="text-ardoise-texte">{eleves.length === 0 ? 'Aucun élève inscrit pour l’instant.' : 'Aucun résultat.'}</p>
           ) : (
             <div className="flex flex-col gap-8">
               <section aria-labelledby="t-eleves" className="flex flex-col gap-2">
-                <h2 id="t-eleves" className="text-lg font-bold">Élèves ({avecAcces.length})</h2>
-                <p className="text-sm text-gray-600">Inscrits qui ont accès à au moins un cours.</p>
+                <h2 id="t-eleves" className="text-lg font-extrabold text-nuit">Élèves ({avecAcces.length})</h2>
+                <p className="text-sm text-ardoise-texte">Inscrits qui ont accès à au moins un cours.</p>
                 <Tableau lignes={avecAcces} vide="Aucun élève avec accès pour l’instant." />
               </section>
               <section aria-labelledby="t-inscrits" className="flex flex-col gap-2">
-                <h2 id="t-inscrits" className="text-lg font-bold">Inscrits ({sansAcces.length})</h2>
-                <p className="text-sm text-gray-600">Inscrits sans accès à un cours pour l’instant.</p>
+                <h2 id="t-inscrits" className="text-lg font-extrabold text-nuit">Inscrits ({sansAcces.length})</h2>
+                <p className="text-sm text-ardoise-texte">Inscrits sans accès à un cours pour l’instant.</p>
                 <Tableau lignes={sansAcces} vide="Aucun inscrit sans accès." />
               </section>
             </div>

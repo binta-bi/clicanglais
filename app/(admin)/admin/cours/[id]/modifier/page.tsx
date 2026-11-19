@@ -74,8 +74,8 @@ function ModifierCours() {
   return (
     <div className="flex flex-col gap-6 max-w-xl">
       <div>
-        <Link href={`/admin/cours/${id}`} className="text-sm text-[#2d3a6b]">← Leçons du cours</Link>
-        <h1 className="text-2xl font-bold mt-2">Modifier le cours</h1>
+        <Link href={`/admin/cours/${id}`} className="text-sm font-semibold text-royal">← Leçons du cours</Link>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit mt-2">Modifier le cours</h1>
       </div>
 
       <form onSubmit={enregistrer} className="flex flex-col gap-4">
@@ -83,7 +83,7 @@ function ModifierCours() {
           Titre
           <input
             value={titre} required onChange={(e) => setTitre(e.target.value)}
-            className="border p-2 rounded font-normal"
+            className="champ-auth !py-2 font-normal"
           />
         </label>
 
@@ -91,7 +91,7 @@ function ModifierCours() {
           Description
           <textarea
             value={description} rows={3} onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 rounded font-normal"
+            className="champ-auth !py-2 font-normal"
           />
         </label>
 
@@ -99,7 +99,7 @@ function ModifierCours() {
           Programme (une leçon par ligne)
           <textarea
             value={programme} rows={10} onChange={(e) => setProgramme(e.target.value)}
-            className="border p-2 rounded font-normal"
+            className="champ-auth !py-2 font-normal"
           />
         </label>
 
@@ -116,7 +116,7 @@ function ModifierCours() {
         {erreur && <p role="alert" className="text-red-500 text-sm">{erreur}</p>}
         {message && <p role="status" className="text-green-700 text-sm">{message}</p>}
 
-        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white p-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={envoi} className="rounded-xl bg-navy px-4 py-2 font-bold text-white hover:bg-nuit disabled:opacity-50">
           {envoi ? 'Enregistrement...' : 'Enregistrer'}
         </button>
       </form>

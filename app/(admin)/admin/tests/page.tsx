@@ -33,21 +33,21 @@ export default function PageTests() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">Tests de niveau</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Tests de niveau</h1>
       <div className="flex flex-col gap-3">
         {tests.map((t) => {
           const total = nombres[t.code] ?? 0
           const requis = Math.ceil((total * t.seuil_pct) / 100)
           return (
-            <div key={t.code} className="border rounded p-4 flex flex-col gap-2">
+            <div key={t.code} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-col gap-2">
               <p className="font-bold">{t.title}</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-ardoise-texte">
                 {total} question{total > 1 ? 's' : ''} · {t.duree_minutes} minutes · réussite à {t.seuil_pct} %
                 {total > 0 && ` (${requis} bonnes réponses sur ${total})`}
               </p>
               <Link
                 href={`/admin/tests/${t.code}`}
-                className="self-start border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded text-sm"
+                className="self-start rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white text-sm"
               >
                 Gérer les questions
               </Link>
@@ -55,7 +55,7 @@ export default function PageTests() {
           )
         })}
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-ardoise-texte">
         Modifier les questions n&apos;change pas les résultats déjà enregistrés. Évite de les modifier pendant
         qu&apos;un élève passe le test.
       </p>

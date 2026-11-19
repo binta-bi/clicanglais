@@ -73,20 +73,20 @@ function Formulaire({
   }
 
   return (
-    <form onSubmit={enregistrer} className="border rounded p-4 flex flex-col gap-3 bg-gray-50">
+    <form onSubmit={enregistrer} className="rounded-2xl bg-mist p-4 flex flex-col gap-3 ring-1 ring-line">
       <h3 className="font-bold">{initiale ? 'Modifier la question' : 'Nouvelle question'}</h3>
       <label className="flex flex-col gap-1 text-sm font-medium">
         Partie (facultatif)
         <input
           value={partie} onChange={(e) => setPartie(e.target.value)}
-          className="border p-2 rounded font-normal bg-white"
+          className="champ-auth !py-2 font-normal"
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium">
         Question
         <textarea
           value={question} rows={2} required onChange={(e) => setQuestion(e.target.value)}
-          className="border p-2 rounded font-normal bg-white"
+          className="champ-auth !py-2 font-normal"
         />
       </label>
       <fieldset className="flex flex-col gap-2">
@@ -100,13 +100,13 @@ function Formulaire({
             <input
               value={c} onChange={(e) => changerChoix(i, e.target.value)}
               aria-label={`Choix ${i + 1}`}
-              className="border p-2 rounded flex-1 min-w-0 bg-white"
+              className="champ-auth !py-2 flex-1 min-w-0"
             />
             {choix.length > 2 && (
               <button
                 type="button" onClick={() => retirerChoix(i)}
                 aria-label={`Retirer le choix ${i + 1}`}
-                className="text-red-500 border border-red-500 rounded px-2 py-1 text-sm"
+                className="rounded-full border-2 border-red-500 px-3 py-1 text-sm font-semibold text-red-600 hover:bg-red-50"
               >
                 ✕
               </button>
@@ -116,7 +116,7 @@ function Formulaire({
         {choix.length < 6 && (
           <button
             type="button" onClick={() => setChoix((c) => [...c, ''])}
-            className="self-start text-sm text-[#2d3a6b] underline"
+            className="self-start text-sm font-semibold text-royal underline"
           >
             + Ajouter un choix
           </button>
@@ -124,10 +124,10 @@ function Formulaire({
       </fieldset>
       {erreur && <p role="alert" className="text-red-500 text-sm">{erreur}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white px-4 py-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={envoi} className="rounded-full bg-navy px-5 py-2.5 font-bold text-white transition-colors hover:bg-nuit disabled:opacity-50">
           {envoi ? 'Enregistrement...' : 'Enregistrer'}
         </button>
-        <button type="button" onClick={onAnnuler} className="border px-4 py-2 rounded">
+        <button type="button" onClick={onAnnuler} className="rounded-full border-2 border-line bg-white px-5 py-2 font-semibold text-nuit hover:border-royal">
           Annuler
         </button>
       </div>
@@ -183,9 +183,9 @@ function GererQuestions() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/admin/tests" className="text-sm text-[#2d3a6b]">← Tests</Link>
-        <h1 className="text-2xl font-bold mt-2">{titre || 'Test'}</h1>
-        <p className="text-sm text-gray-600 mt-1">
+        <Link href="/admin/tests" className="text-sm font-semibold text-royal">← Tests</Link>
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit mt-2">{titre || 'Test'}</h1>
+        <p className="text-sm text-ardoise-texte mt-1">
           {questions.length} question{questions.length > 1 ? 's' : ''}. Les élèves ne voient jamais les bonnes réponses.
         </p>
       </div>
@@ -197,7 +197,7 @@ function GererQuestions() {
       ) : (
         <button
           onClick={() => setEdition('nouvelle')}
-          className="self-start bg-[#2d3a6b] text-white px-4 py-2 rounded"
+          className="self-start rounded-full bg-navy px-5 py-2.5 font-bold text-white transition-colors hover:bg-nuit"
         >
           + Ajouter une question
         </button>
@@ -211,12 +211,12 @@ function GererQuestions() {
               onFini={fini} onAnnuler={() => setEdition(null)}
             />
           ) : (
-            <div key={q.id} className="border rounded p-4 flex flex-col gap-2">
-              {q.partie && <p className="text-xs uppercase text-gray-500">{q.partie}</p>}
+            <div key={q.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-col gap-2">
+              {q.partie && <p className="text-xs uppercase text-ardoise-texte">{q.partie}</p>}
               <p className="font-medium">{i + 1}. {q.question}</p>
               <ul className="text-sm flex flex-col gap-1">
                 {q.choices.map((c) => (
-                  <li key={c} className={c === q.correct_answer ? 'text-green-700 font-bold' : 'text-gray-700'}>
+                  <li key={c} className={c === q.correct_answer ? 'text-green-700 font-bold' : 'text-ardoise-texte'}>
                     {c === q.correct_answer ? '✓ ' : '• '}{c}
                   </li>
                 ))}
@@ -225,10 +225,10 @@ function GererQuestions() {
                 <p className="text-sm text-red-500">Aucune bonne réponse définie : modifie cette question.</p>
               )}
               <div className="flex flex-wrap gap-2 text-sm">
-                <button onClick={() => deplacer(q.id, -1)} disabled={i === 0} aria-label={`Monter la question ${i + 1}`} className="border px-3 py-1 rounded disabled:opacity-30">↑</button>
-                <button onClick={() => deplacer(q.id, 1)} disabled={i === questions.length - 1} aria-label={`Descendre la question ${i + 1}`} className="border px-3 py-1 rounded disabled:opacity-30">↓</button>
-                <button onClick={() => setEdition(q.id)} className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded">Modifier</button>
-                <button onClick={() => supprimer(q, i + 1)} className="border border-red-500 text-red-500 px-3 py-1 rounded">Supprimer</button>
+                <button onClick={() => deplacer(q.id, -1)} disabled={i === 0} aria-label={`Monter la question ${i + 1}`} className="rounded-full border-2 border-line bg-white px-4 py-1.5 font-semibold text-nuit hover:border-royal disabled:opacity-30">↑</button>
+                <button onClick={() => deplacer(q.id, 1)} disabled={i === questions.length - 1} aria-label={`Descendre la question ${i + 1}`} className="rounded-full border-2 border-line bg-white px-4 py-1.5 font-semibold text-nuit hover:border-royal disabled:opacity-30">↓</button>
+                <button onClick={() => setEdition(q.id)} className="rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white">Modifier</button>
+                <button onClick={() => supprimer(q, i + 1)} className="rounded-full border-2 border-red-500 px-4 py-1.5 font-semibold text-red-600 hover:bg-red-50">Supprimer</button>
               </div>
             </div>
           ),

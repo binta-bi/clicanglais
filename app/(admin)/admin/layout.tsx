@@ -34,8 +34,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!ok) return <p className="text-center mt-10">Vérification...</p>
   return (
-    <div className="max-w-5xl mx-auto px-4 mt-6">
-      <nav aria-label="Espace professeur" className="menu-liens mb-6 flex flex-wrap gap-x-4 gap-y-2 border-b pb-3 font-medium">
+    <div className="hero-ivoire min-h-[calc(100dvh-4.2rem)]">
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <nav aria-label="Espace professeur" className="admin-nav mb-8">
         <LienMenu href="/admin">Accueil</LienMenu>
         <LienPaiements href="/admin/paiements" />
         <LienMenu href="/admin/statistiques">Statistiques</LienMenu>
@@ -51,6 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <LienMessages href="/admin/messages" />
       </nav>
       {children}
+    </div>
     </div>
   )
 }

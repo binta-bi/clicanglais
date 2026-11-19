@@ -144,13 +144,13 @@ export default function AdminDirect() {
     }
   }
 
-  const champ = 'border p-2 rounded'
+  const champ = 'champ-auth !py-2'
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-bold">Cours en direct</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Cours en direct</h1>
 
-      <form ref={formulaire} onSubmit={ajouter} className="border rounded p-4 flex flex-col gap-3 max-w-xl">
+      <form ref={formulaire} onSubmit={ajouter} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-col gap-3 max-w-xl">
         <h2 className="font-bold">{enEdition ? 'Modifier la séance' : 'Programmer une séance'}</h2>
         <label className="flex flex-col gap-1 text-sm">
           Cours concerné
@@ -192,25 +192,25 @@ export default function AdminDirect() {
             {message}
           </p>
         )}
-        <button type="submit" disabled={envoi} className="bg-[#2d3a6b] text-white p-2 rounded disabled:opacity-50">
+        <button type="submit" disabled={envoi} className="rounded-xl bg-navy px-4 py-2 font-bold text-white hover:bg-nuit disabled:opacity-50">
           {envoi ? 'Enregistrement...' : enEdition ? 'Enregistrer les modifications' : 'Ajouter la séance'}
         </button>
         {enEdition && (
-          <button type="button" onClick={reinitialiser} className="border p-2 rounded">
+          <button type="button" onClick={reinitialiser} className="champ-auth !py-2">
             Annuler la modification
           </button>
         )}
       </form>
 
       <div className="flex flex-col gap-3">
-        {seances.length === 0 && <p className="text-gray-500">Aucune séance programmée.</p>}
+        {seances.length === 0 && <p className="text-ardoise-texte">Aucune séance programmée.</p>}
         {seances.map((s) => {
           const finie = maintenant > 0 && new Date(s.ends_at).getTime() < maintenant
           return (
-            <div key={s.id} className="border rounded p-4 flex flex-col gap-3">
+            <div key={s.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line flex flex-col gap-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-gray-500">{s.courses?.title}</p>
+                  <p className="text-sm text-ardoise-texte">{s.courses?.title}</p>
                   <p className="font-bold">{s.title}</p>
                   <p className="first-letter:uppercase">{quand(s.starts_at)}</p>
                   {finie && !s.replay_url && <p className="text-sm text-[#e8652d]">Séance terminée : ajoute la rediffusion.</p>}
@@ -219,11 +219,11 @@ export default function AdminDirect() {
                   <button
                     onClick={() => modifier(s)}
                     aria-label={`Modifier ${s.title}`}
-                    className="border border-[#2d3a6b] text-[#2d3a6b] px-3 py-1 rounded text-sm"
+                    className="rounded-full border-2 border-navy px-4 py-1.5 font-semibold text-navy hover:bg-navy hover:text-white text-sm"
                   >
                     Modifier
                   </button>
-                  <button onClick={() => supprimer(s)} className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm">
+                  <button onClick={() => supprimer(s)} className="rounded-full border-2 border-red-500 px-4 py-1.5 font-semibold text-red-600 hover:bg-red-50 text-sm">
                     Supprimer
                   </button>
                 </div>
@@ -237,7 +237,7 @@ export default function AdminDirect() {
                   onChange={(e) => setReplays((r) => ({ ...r, [s.id]: e.target.value }))}
                   className={`${champ} flex-1 min-w-48`}
                 />
-                <button onClick={() => enregistrerReplay(s)} className="border px-3 py-1 rounded">
+                <button onClick={() => enregistrerReplay(s)} className="rounded-full border-2 border-line bg-white px-4 py-1.5 font-semibold text-nuit hover:border-royal">
                   Enregistrer
                 </button>
               </div>

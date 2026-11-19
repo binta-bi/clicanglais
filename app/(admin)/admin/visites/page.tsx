@@ -30,10 +30,10 @@ const NOMS_PAGES: Record<string, string> = {
 
 function Carte({ titre, valeur, detail }: { titre: string; valeur: number | string; detail?: string }) {
   return (
-    <div className="rounded border p-4">
-      <p className="text-sm text-gray-500">{titre}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums">{valeur}</p>
-      {detail && <p className="mt-1 text-sm text-gray-500">{detail}</p>}
+    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line">
+      <p className="text-sm text-ardoise-texte">{titre}</p>
+      <p className="mt-1 text-3xl font-extrabold tracking-tight text-nuit tabular-nums">{valeur}</p>
+      {detail && <p className="mt-1 text-sm text-ardoise-texte">{detail}</p>}
     </div>
   )
 }
@@ -69,15 +69,15 @@ export default function Visites() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">Visites du site</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <h1 className="text-3xl font-extrabold tracking-tight text-nuit">Visites du site</h1>
+        <p className="mt-1 text-sm text-ardoise-texte">
           Une visite = une personne qui ouvre le site (un onglet). Les chiffres sont anonymes : on ne voit ni nom ni email. Tes
           propres visites ne sont pas comptées.
         </p>
       </div>
 
       <section aria-labelledby="v-chiffres" className="flex flex-col gap-4">
-        <h2 id="v-chiffres" className="text-xl font-bold">En chiffres</h2>
+        <h2 id="v-chiffres" className="text-xl font-extrabold text-nuit">En chiffres</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <Carte titre="Aujourd’hui" valeur={s.aujourdhui.visites} detail={`${s.aujourdhui.pages} pages vues`} />
           <Carte titre="7 derniers jours" valeur={s.sept_jours.visites} detail={`${s.sept_jours.pages} pages vues`} />
@@ -90,11 +90,11 @@ export default function Visites() {
       </section>
 
       <section aria-labelledby="v-jours" className="flex flex-col gap-3">
-        <h2 id="v-jours" className="text-xl font-bold">Les 14 derniers jours</h2>
+        <h2 id="v-jours" className="text-xl font-extrabold text-nuit">Les 14 derniers jours</h2>
         <ul className="flex flex-col gap-1">
           {s.par_jour.map((j) => (
             <li key={j.jour} className="flex items-center gap-3 text-sm">
-              <span className="w-24 shrink-0 text-gray-600">
+              <span className="w-24 shrink-0 text-ardoise-texte">
                 {new Date(j.jour + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}
               </span>
               <span className="h-4 rounded bg-brand" style={{ width: `${(j.visites / max) * 100}%`, minWidth: j.visites ? '4px' : 0 }} aria-hidden="true" />
@@ -105,9 +105,9 @@ export default function Visites() {
       </section>
 
       <section aria-labelledby="v-pages" className="flex flex-col gap-3">
-        <h2 id="v-pages" className="text-xl font-bold">Pages les plus vues (30 jours)</h2>
+        <h2 id="v-pages" className="text-xl font-extrabold text-nuit">Pages les plus vues (30 jours)</h2>
         {s.top_pages.length === 0 ? (
-          <p className="text-gray-500">Aucune visite enregistrée pour l’instant.</p>
+          <p className="text-ardoise-texte">Aucune visite enregistrée pour l’instant.</p>
         ) : (
           <ol className="list-decimal pl-5">
             {s.top_pages.map((p) => (

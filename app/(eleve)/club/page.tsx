@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { BoutonsPieces, PieceAffichee } from '@/components/PiecesJointes'
 import PhotoProfil from '@/components/PhotoProfil'
 import { useAvatars, oublierAvatar } from '@/lib/avatars'
-import { Avatar, Bandeau, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeGroupe, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
+import { Avatar, BoutonEnvoyer, Bulle, CarteChat, EnteteChat, IconeGroupe, SeparateurJour, cleJour, heureCourte } from '@/components/ChatUI'
 import type { Piece, TypePiece } from '@/lib/pieces-jointes'
 
 type Message = {
@@ -247,10 +247,6 @@ export default function Club() {
             </div>
           )}
         </EnteteChat>
-        <Bandeau>
-          Échange avec les autres élèves de ton niveau et le professeur. Reste poli et ne partage pas d&apos;informations
-          personnelles (numéro de téléphone, mot de passe).
-        </Bandeau>
         <PhotoProfil nom="Moi" />
 
         <div

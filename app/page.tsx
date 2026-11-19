@@ -2,6 +2,7 @@ import Link from 'next/link'
 import LessonDemo from '@/components/LessonDemo'
 import HeroPhoto from '@/components/HeroPhoto'
 import CompteurAnime from '@/components/CompteurAnime'
+import AvisAccueil from '@/components/AvisAccueil'
 import { niveaux, PRIX_MOIS, PRIX_NIVEAU, fcfa, type Niveau } from '@/lib/niveaux'
 
 // Délai d'apparition d'un bloc du héros (animation échelonnée)
@@ -505,6 +506,8 @@ export default function Accueil() {
       </section>
 
       {/* Appel final */}
+      <AvisAccueil />
+
       <section className="relative overflow-hidden bg-navy text-white">
         <div
           aria-hidden="true"

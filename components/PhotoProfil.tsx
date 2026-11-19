@@ -106,25 +106,25 @@ export default function PhotoProfil({ nom = 'Moi' }: { nom?: string }) {
   if (!uid) return null
 
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b border-line bg-white px-4 py-2.5 sm:px-5">
-      <Avatar nom={nom} src={url} className="size-10 text-sm" />
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-line bg-white px-4 py-2 sm:px-5">
+      <Avatar nom={nom} src={url} className="size-9 text-sm" />
       <div className="flex flex-wrap items-center gap-2">
         <input ref={champ} id="photo-profil" type="file" accept="image/*" onChange={choisir} className="sr-only" />
         <button
           type="button"
           onClick={() => champ.current?.click()}
           disabled={occupe}
-          className="rounded-full bg-mist px-3.5 py-1.5 text-sm font-semibold text-navy ring-1 ring-line transition-colors hover:bg-white disabled:opacity-50"
+          className="rounded-full bg-mist px-3.5 py-1 text-sm font-semibold text-navy ring-1 ring-line transition-colors hover:bg-white disabled:opacity-50"
         >
-          {occupe ? 'Envoi...' : url ? 'Changer ma photo' : 'Ajouter ma photo'}
+          {occupe ? 'Envoi...' : url ? 'Changer' : 'Ajouter ma photo'}{url && !occupe && <span className="sr-only"> ma photo</span>}
         </button>
         {url && !occupe && (
-          <button type="button" onClick={retirer} className="px-2 py-1.5 text-sm font-semibold text-ardoise-texte underline">
-            Retirer ma photo
+          <button type="button" onClick={retirer} className="px-1 py-1 text-sm font-semibold text-ardoise-texte underline">
+            Retirer<span className="sr-only"> ma photo</span>
           </button>
         )}
       </div>
-      <p role={erreur ? 'alert' : 'status'} className={`text-sm ${erreur ? 'font-medium text-red-800' : 'text-ardoise-texte'}`}>
+      <p hidden={!erreur && !info} role={erreur ? 'alert' : 'status'} className={`text-sm ${erreur ? 'font-medium text-red-800' : 'text-ardoise-texte'}`}>
         {erreur || info}
       </p>
     </div>

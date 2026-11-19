@@ -692,3 +692,35 @@ body {
     transform: none;
   }
 }
+
+/* ---------- Formulaires (connexion, inscription, mot de passe) ---------- */
+@layer components {
+.champ-auth {
+  display: block;
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1.5px solid var(--color-line);
+  background: #fff;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  color: var(--color-ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.champ-auth:hover {
+  border-color: #b4c0e0;
+}
+.champ-auth:focus {
+  outline: none;
+  border-color: var(--color-royal);
+  box-shadow: 0 0 0 3px rgb(36 75 120 / 0.18);
+}
+.champ-auth::placeholder {
+  color: var(--color-ardoise);
+  opacity: 0.85;
+}
+}
+.btn-hero:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}

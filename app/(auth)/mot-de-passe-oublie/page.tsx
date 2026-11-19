@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { AuthCarte, AuthShell, AuthTitre, Champ, IconeRonde, MessageErreur } from '@/components/AuthShell'
 
 export default function MotDePasseOublie() {
   const [email, setEmail] = useState('')
@@ -25,42 +26,60 @@ export default function MotDePasseOublie() {
     setEnvoye(true)
   }
 
-  const champ = 'rounded-xl border-2 border-line px-4 py-3 text-base'
-
   if (envoye) {
     return (
-      <div className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-        <h1 className="text-3xl font-extrabold tracking-tight">Vérifie ta boîte mail</h1>
-        <p role="status" className="rounded-xl bg-mist p-4 font-medium">
-          Si un compte existe avec l&apos;adresse {email}, tu vas recevoir un email avec un lien pour choisir un
-          nouveau mot de passe. Pense à regarder dans les courriers indésirables.
-        </p>
-        <Link href="/connexion" className="font-bold underline">
-          Retour à la connexion
-        </Link>
-      </div>
+      <AuthShell>
+        <AuthCarte>
+          <IconeRonde>
+            <path d="M3 6.5h18v11H3zM3 7l9 6.5L21 7" />
+          </IconeRonde>
+          <AuthTitre titre="Vérifie ta boîte mail" />
+          <p role="status" className="rounded-xl bg-mist p-4 font-medium ring-1 ring-line">
+            Si un compte existe avec l&apos;adresse {email}, tu vas recevoir un email avec un lien pour choisir un
+            nouveau mot de passe. Pense à regarder dans les courriers indésirables.
+          </p>
+          <Link href="/connexion" className="mt-6 inline-block font-bold text-royal underline-offset-4 hover:underline">
+            Retour à la connexion
+          </Link>
+        </AuthCarte>
+      </AuthShell>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-      <h1 className="text-3xl font-extrabold tracking-tight">Mot de passe oublié</h1>
-      <p>Écris l&apos;adresse email de ton compte. Nous t&apos;envoyons un lien pour choisir un nouveau mot de passe.</p>
-      <label className="flex flex-col gap-1 font-medium">
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={champ} required />
-      </label>
-      {erreur && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
-          {erreur}
-        </p>
-      )}
-      <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
-        {envoi ? 'Envoi...' : 'Envoyer le lien'}
-      </button>
-      <Link href="/connexion" className="font-bold underline">
-        Retour à la connexion
-      </Link>
-    </form>
+    <AuthShell>
+      <AuthCarte>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div>
+            <IconeRonde>
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </IconeRonde>
+            <AuthTitre
+              titre="Mot de passe oublié"
+              sous="Écris l'adresse email de ton compte. Nous t'envoyons un lien pour choisir un nouveau mot de passe."
+            />
+          </div>
+          <Champ id="email" label="Email">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              className="champ-auth"
+              required
+            />
+          </Champ>
+          {erreur && <MessageErreur>{erreur}</MessageErreur>}
+          <button type="submit" disabled={envoi} className="btn-hero w-full">
+            {envoi ? 'Envoi...' : 'Envoyer le lien'}
+          </button>
+          <Link href="/connexion" className="text-center text-sm font-semibold text-royal underline-offset-4 hover:underline">
+            Retour à la connexion
+          </Link>
+        </form>
+      </AuthCarte>
+    </AuthShell>
   )
 }

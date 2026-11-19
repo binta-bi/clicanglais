@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { AuthCarte, AuthShell, AuthTitre, Champ, ChampMotDePasse, MessageErreur } from '@/components/AuthShell'
 
 export default function Connexion() {
   const [email, setEmail] = useState('')
@@ -30,36 +31,45 @@ export default function Connexion() {
     router.push(profil?.role === 'professeur' ? '/admin' : profil?.niveau ? '/mes-cours' : '/niveau')
   }
 
-  const champ = 'rounded-xl border-2 border-line px-4 py-3 text-base'
-
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-      <h1 className="text-3xl font-extrabold tracking-tight">Se connecter</h1>
-      <label className="flex flex-col gap-1 font-medium">
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={champ} required />
-      </label>
-      <label className="flex flex-col gap-1 font-medium">
-        Mot de passe
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={champ} required />
-      </label>
-      {erreur && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
-          {erreur}
+    <AuthShell
+      photo="/apprenant.jpg"
+      titre="Content de te revoir"
+      accroche="Retrouve tes cours, tes replays et le club de ton niveau."
+      puces={['Cours en direct de 20h à 21h30', 'Replay de chaque séance', 'Le club pour pratiquer avec les autres élèves']}
+    >
+      <AuthCarte>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <AuthTitre titre="Se connecter" sous="Entre tes identifiants pour accéder à ton espace." />
+          <Champ id="email" label="Email">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              className="champ-auth"
+              required
+            />
+          </Champ>
+          <Champ id="mdp" label="Mot de passe">
+            <ChampMotDePasse id="mdp" value={password} onChange={setPassword} autoComplete="current-password" />
+          </Champ>
+          {erreur && <MessageErreur>{erreur}</MessageErreur>}
+          <button type="submit" disabled={envoi} className="btn-hero w-full">
+            {envoi ? 'Connexion...' : 'Se connecter'}
+          </button>
+          <Link href="/mot-de-passe-oublie" className="text-center text-sm font-semibold text-royal underline-offset-4 hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </form>
+        <p className="mt-6 border-t border-line pt-5 text-center text-ardoise-texte">
+          Pas encore de compte ?{' '}
+          <Link href="/inscription" className="font-bold text-royal underline-offset-4 hover:underline">
+            S’inscrire
+          </Link>
         </p>
-      )}
-      <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
-        {envoi ? 'Connexion...' : 'Se connecter'}
-      </button>
-      <Link href="/mot-de-passe-oublie" className="font-medium underline">
-        Mot de passe oublié ?
-      </Link>
-      <p>
-        Pas encore de compte ?{' '}
-        <Link href="/inscription" className="font-bold underline">
-          S’inscrire
-        </Link>
-      </p>
-    </form>
+      </AuthCarte>
+    </AuthShell>
   )
 }

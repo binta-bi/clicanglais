@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { AuthCarte, AuthShell, AuthTitre, Champ, ChampMotDePasse, IconeRonde, MessageErreur } from '@/components/AuthShell'
 
 type Etat = 'attente' | 'pret' | 'invalide' | 'fait'
 
@@ -58,76 +59,79 @@ export default function NouveauMotDePasse() {
     setEtat('fait')
   }
 
-  const champ = 'rounded-xl border-2 border-line px-4 py-3 text-base'
-
   if (etat === 'attente') {
     return (
-      <p role="status" className="mx-auto mt-16 max-w-md px-5 text-center text-lg">
-        Vérification du lien...
-      </p>
+      <AuthShell>
+        <p role="status" className="py-16 text-center text-lg text-ardoise-texte">
+          Vérification du lien...
+        </p>
+      </AuthShell>
     )
   }
 
   if (etat === 'invalide') {
     return (
-      <div className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-        <h1 className="text-3xl font-extrabold tracking-tight">Lien invalide ou expiré</h1>
-        <p>Ce lien ne fonctionne plus. Demande-en un nouveau, il est valable peu de temps et une seule fois.</p>
-        <Link href="/mot-de-passe-oublie" className="btn-primary w-fit">
-          Demander un nouveau lien
-        </Link>
-      </div>
+      <AuthShell>
+        <AuthCarte>
+          <IconeRonde>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7.5v5M12 16.2v.1" />
+          </IconeRonde>
+          <AuthTitre
+            titre="Lien invalide ou expiré"
+            sous="Ce lien ne fonctionne plus. Demande-en un nouveau, il est valable peu de temps et une seule fois."
+          />
+          <Link href="/mot-de-passe-oublie" className="btn-hero w-full">
+            Demander un nouveau lien
+          </Link>
+        </AuthCarte>
+      </AuthShell>
     )
   }
 
   if (etat === 'fait') {
     return (
-      <div className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-        <h1 className="text-3xl font-extrabold tracking-tight">Mot de passe modifié</h1>
-        <p role="status" className="rounded-xl bg-mist p-4 font-medium">
-          Ton nouveau mot de passe est enregistré. Tu es connecté.
-        </p>
-        <Link href="/mes-cours" className="btn-primary w-fit">
-          Aller à mes cours
-        </Link>
-      </div>
+      <AuthShell>
+        <AuthCarte>
+          <IconeRonde>
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8 12.3 2.8 2.8L16.2 9.5" />
+          </IconeRonde>
+          <AuthTitre titre="Mot de passe modifié" />
+          <p role="status" className="rounded-xl bg-mist p-4 font-medium ring-1 ring-line">
+            Ton nouveau mot de passe est enregistré. Tu es connecté.
+          </p>
+          <Link href="/mes-cours" className="btn-hero mt-6 w-full">
+            Aller à mes cours
+          </Link>
+        </AuthCarte>
+      </AuthShell>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-      <h1 className="text-3xl font-extrabold tracking-tight">Nouveau mot de passe</h1>
-      <label className="flex flex-col gap-1 font-medium">
-        Nouveau mot de passe (8 caractères minimum)
-        <input
-          type="password"
-          value={mdp}
-          onChange={(e) => setMdp(e.target.value)}
-          className={champ}
-          minLength={8}
-          autoComplete="new-password"
-          required
-        />
-      </label>
-      <label className="flex flex-col gap-1 font-medium">
-        Répète le mot de passe
-        <input
-          type="password"
-          value={confirmation}
-          onChange={(e) => setConfirmation(e.target.value)}
-          className={champ}
-          autoComplete="new-password"
-          required
-        />
-      </label>
-      {erreur && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
-          {erreur}
-        </p>
-      )}
-      <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
-        {envoi ? 'Enregistrement...' : 'Enregistrer le mot de passe'}
-      </button>
-    </form>
+    <AuthShell>
+      <AuthCarte>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div>
+            <IconeRonde>
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </IconeRonde>
+            <AuthTitre titre="Nouveau mot de passe" />
+          </div>
+          <Champ id="nmdp" label="Nouveau mot de passe (8 caractères minimum)">
+            <ChampMotDePasse id="nmdp" value={mdp} onChange={setMdp} minLength={8} autoComplete="new-password" />
+          </Champ>
+          <Champ id="cmdp" label="Répète le mot de passe">
+            <ChampMotDePasse id="cmdp" value={confirmation} onChange={setConfirmation} autoComplete="new-password" />
+          </Champ>
+          {erreur && <MessageErreur>{erreur}</MessageErreur>}
+          <button type="submit" disabled={envoi} className="btn-hero w-full">
+            {envoi ? 'Enregistrement...' : 'Enregistrer le mot de passe'}
+          </button>
+        </form>
+      </AuthCarte>
+    </AuthShell>
   )
 }

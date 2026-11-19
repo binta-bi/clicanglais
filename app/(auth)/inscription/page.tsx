@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { composerTelephone } from '@/lib/telephone'
 import { PAYS, drapeau } from '@/lib/pays'
+import { AuthCarte, AuthShell, AuthTitre, Champ, ChampMotDePasse, MessageErreur } from '@/components/AuthShell'
 
 export default function Inscription() {
   const [email, setEmail] = useState('')
@@ -52,105 +53,117 @@ export default function Inscription() {
     }
   }
 
-  const champ = 'rounded-xl border-2 border-line px-4 py-3 text-base'
-
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-10 flex max-w-md flex-col gap-4 px-5 pb-16">
-      <h1 className="text-3xl font-extrabold tracking-tight">Créer un compte</h1>
-      <label className="flex flex-col gap-1 font-medium">
-        Nom complet
-        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={champ} required />
-      </label>
-      <div role="group" aria-labelledby="lib-tel" className="flex flex-col gap-1 font-medium">
-        <span id="lib-tel">Numéro WhatsApp</span>
-        <div className="flex gap-2">
-          <select
-            value={indicatif}
-            onChange={(e) => setIndicatif(e.target.value)}
-            aria-label="Pays"
-            className={`${champ} w-40 shrink-0 px-2`}
-            required
-          >
-            <option value="" disabled>
-             pays
-            </option>
-            {PAYS.map((p) => (
-              <option key={p.iso} value={p.iso}>
-                {drapeau(p.iso)} +{p.indicatif} {p.nom}
-              </option>
-            ))}
-          </select>
-          <input
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-national"
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
-            placeholder="00 00 00 00 00"
-            aria-label="Numéro de téléphone"
-            className={`${champ} min-w-0 flex-1`}
-            required
-            aria-describedby="aide-tel"
-          />
-        </div>
-        <span id="aide-tel" className="text-sm font-normal text-ink/70">
-          Choisis ton pays, puis écris ton numéro. L’équipe ClicAnglais l’utilisera pour te contacter.
-        </span>
-      </div>
-      <label className="flex flex-col gap-1 font-medium">
-        Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={champ} required />
-      </label>
-      <label className="flex flex-col gap-1 font-medium">
-        Mot de passe
-        <input
-          type="password"
-          value={password}
-          minLength={6}
-          onChange={(e) => setPassword(e.target.value)}
-          className={champ}
-          required
-        />
-      </label>
-      {erreur && (
-        <p role="alert" className="rounded-xl bg-red-50 p-3 font-medium text-red-800">
-          {erreur}
-        </p>
-      )}
-      {message && (
-        <p role="status" className="rounded-xl bg-mist p-3 font-medium">
-          {message}
-        </p>
-      )}
-      <label className="flex items-start gap-3 text-sm">
-        <input
-          type="checkbox"
-          checked={accepte}
-          onChange={(e) => setAccepte(e.target.checked)}
-          required
-          className="mt-0.5 h-5 w-5 shrink-0"
-        />
-        <span>
-          J’accepte les{' '}
-          <Link href="/cgu" target="_blank" className="font-bold underline">
-            conditions d’utilisation
-          </Link>{' '}
-          et la{' '}
-          <Link href="/confidentialite" target="_blank" className="font-bold underline">
-            politique de confidentialité
+    <AuthShell
+      photo="/niveau-debutant.jpg"
+      titre="Commence ton anglais dès aujourd’hui"
+      accroche="Quelques minutes suffisent pour créer ton compte."
+      puces={['Crée ton compte', 'Choisis ton niveau : test ou Débutant', 'Rejoins les cours en direct et le club']}
+    >
+      <AuthCarte>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <AuthTitre titre="Créer un compte" />
+          <Champ id="nom" label="Nom complet">
+            <input
+              id="nom"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
+              className="champ-auth"
+              required
+            />
+          </Champ>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="tel" className="text-sm font-semibold text-nuit">
+              Numéro WhatsApp
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={indicatif}
+                onChange={(e) => setIndicatif(e.target.value)}
+                aria-label="Pays"
+                className="champ-auth w-[8.5rem] min-w-0 shrink-0 !px-2 sm:w-40"
+                required
+              >
+                <option value="" disabled>
+                  Pays
+                </option>
+                {PAYS.map((p) => (
+                  <option key={p.iso} value={p.iso}>
+                    {drapeau(p.iso)} +{p.indicatif} {p.nom}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
+                value={telephone}
+                onChange={(e) => setTelephone(e.target.value)}
+                placeholder="00 00 00 00 00"
+                id="tel"
+                aria-label="Numéro WhatsApp (numéro de téléphone)"
+                className="champ-auth min-w-0 flex-1"
+                required
+                aria-describedby="aide-tel"
+              />
+            </div>
+            <span id="aide-tel" className="text-sm text-ardoise-texte">
+              Choisis ton pays, puis écris ton numéro. L’équipe ClicAnglais l’utilisera pour te contacter.
+            </span>
+          </div>
+          <Champ id="email" label="Email">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              className="champ-auth"
+              required
+            />
+          </Champ>
+          <Champ id="mdp" label="Mot de passe" aide="6 caractères minimum.">
+            <ChampMotDePasse id="mdp" value={password} onChange={setPassword} minLength={6} autoComplete="new-password" />
+          </Champ>
+          {erreur && <MessageErreur>{erreur}</MessageErreur>}
+          {message && (
+            <p role="status" className="rounded-xl bg-mist p-3 text-sm font-medium ring-1 ring-line">
+              {message}
+            </p>
+          )}
+          <label className="flex items-start gap-3 rounded-xl bg-ivoire p-3 text-sm leading-snug ring-1 ring-nuit/10">
+            <input
+              type="checkbox"
+              checked={accepte}
+              onChange={(e) => setAccepte(e.target.checked)}
+              required
+              className="mt-0.5 size-5 shrink-0 accent-[#244b78]"
+            />
+            <span>
+              J’accepte les{' '}
+              <Link href="/cgu" target="_blank" className="font-bold text-royal underline">
+                conditions d’utilisation
+              </Link>{' '}
+              et la{' '}
+              <Link href="/confidentialite" target="_blank" className="font-bold text-royal underline">
+                politique de confidentialité
+              </Link>
+              .
+            </span>
+          </label>
+          <button type="submit" disabled={envoi} className="btn-hero w-full">
+            {envoi ? 'Création...' : 'S’inscrire'}
+          </button>
+        </form>
+        <p className="mt-6 border-t border-line pt-5 text-center text-ardoise-texte">
+          Tu as déjà un compte ?{' '}
+          <Link href="/connexion" className="font-bold text-royal underline-offset-4 hover:underline">
+            Se connecter
           </Link>
-          .
-        </span>
-      </label>
-      <button type="submit" disabled={envoi} className="btn-primary disabled:opacity-50">
-        {envoi ? 'Création...' : 'S’inscrire'}
-      </button>
-      <p>
-        Tu as déjà un compte ?{' '}
-        <Link href="/connexion" className="font-bold underline">
-          Se connecter
-        </Link>
-      </p>
-    </form>
+        </p>
+      </AuthCarte>
+    </AuthShell>
   )
 }
